@@ -42,6 +42,7 @@ jobs:
       
       - run: |
          echo Testing again
+         ls
          cat recent_tag.json
 
       - name: get properties
