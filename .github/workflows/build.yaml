@@ -42,5 +42,5 @@ jobs:
           mvn clean install \
           -U \
           -Dtinkar-example-data-properties.version=${{steps.recent_tag.outputs.LATEST_TAG}} \
-          -Dmaven.build.cache.skipCache=true 
+          -Dmaven.build.cache.skipCache=true  
          
