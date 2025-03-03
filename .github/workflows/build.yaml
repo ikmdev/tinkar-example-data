@@ -36,7 +36,7 @@ jobs:
       - name: Get Latest Version
         id: recent_tag
         run: |
-          curl https://search.maven.org/solrsearch/select?q=g:%22dev.ikm.tinkar%22+AND+a:%22tinkar-core%22&wt=json >> recent_tag.json
+          curl https://search.maven.org/solrsearch/select?q=g:%22dev.ikm.tinkar%22+AND+a:%22tinkar-core%22&wt=json -o recent_tag.json
           echo
           echo Testing
       
