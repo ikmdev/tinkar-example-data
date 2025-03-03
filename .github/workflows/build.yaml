@@ -26,16 +26,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          ref: ikmdev/data-properties
           fetch-depth: 0
-      
-      - uses: actions/setup-java@v4
-        with:
-            java-version: '23'
-            distribution: 'zulu'
 
       - name: Get Recent Tag
         id: recent_tag
         run: echo LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`) >> GITHUB_OUTPUT
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ikmdev/tinkar-example-data
+          fetch-depth: 0
+   
+      - uses: actions/setup-java@v4
+        with:
+            java-version: '23'
+            distribution: 'zulu'
           
       - name: Build IKM Pipeline
         run: |
