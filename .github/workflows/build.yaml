@@ -35,12 +35,22 @@ jobs:
 
       - name: Get Latest Version
         id: recent_tag
-        run: curl https://search.maven.org/solrsearch/select?q=g:%22dev.ikm.tinkar%22+AND+a:%22tinkar-core%22&wt=json
+        run: curl https://search.maven.org/solrsearch/select?q=g:%22dev.ikm.tinkar%22+AND+a:%22tinkar-core%22&wt=json >> recent_tag.json
+
+      - name: get properties
+        id: json_properties
+        uses: ActionsTools/read-json-action@main
+        with:
+          file_path: "recent_tag.json"
+      
+      - run: |
+          echo ${{steps.json_properties.outputs.name}}
+          echo ${{steps.json_properties.outputs.response.docs.LatestVersion}}
           
-      - name: Build IKM Pipeline
-        run: |
-          mvn clean install \
-          -U \
-          -Dtinkar-example-data-properties.version=${{steps.recent_tag.outputs.LATEST_TAG}} \
-          -Dmaven.build.cache.skipCache=true  
+      # - name: Build IKM Pipeline
+      #   run: |
+      #     mvn clean install \
+      #     -U \
+      #     -Dtinkar-example-data-properties.version=${{steps.recent_tag.outputs.LATEST_TAG}} \
+      #     -Dmaven.build.cache.skipCache=true  
          
