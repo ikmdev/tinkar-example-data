@@ -39,7 +39,10 @@ jobs:
           curl https://search.maven.org/solrsearch/select?q=g:%22dev.ikm.tinkar%22+AND+a:%22tinkar-core%22&wt=json >> recent_tag.json
           echo
           echo Testing
-          cat recent_tag.json
+      
+      - run: |
+         echo Testing again
+         cat recent_tag.json
 
       - name: get properties
         id: json_properties
