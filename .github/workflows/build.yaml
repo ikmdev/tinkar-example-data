@@ -31,7 +31,9 @@ jobs:
             distribution: 'zulu'
           
       - name: Build IKMDEV Code
-        uses: ikmdev/maven-clean-install-build-action@v2.0.0
+        uses: ikmdev/maven-clean-install-build-action@main
         with:
           branch_name: ${{github.ref_name}}
+          java_version: '21'
+          mvn_additional_args: '-Dtinkar-example-data-properties.version=1.0.0'
          
