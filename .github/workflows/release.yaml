@@ -66,3 +66,18 @@ jobs:
           release_version: ${{ github.event.inputs.release_version }}
           java_version: '21'
           mvn_additional_args: '-Dtinkar-example-data-properties.version=1.0.0'
+
+      - name: Update Dropdown
+        run: |
+          echo LATEST-TAG=$(git describe --tags $(git rev-list --tags --max-count=1)) >> $GITHUB_OUTPUT
+          git config user.name "ikmdevops"
+          git config user.email 'devops@ikm.dev'
+          git pull -p;
+          yq -i '.on.workflow_dispatch.inputs.tag_name.options = ["$LATEST-TAG"] + .on.workflow_dispatch.inputs.tag_name.options' .github/workflows/generate-data-pipeline.yaml
+          git commit -am"Updated Generate Data Pipeline With $LATEST-TAG"
+          git push
+            
+            
+
+ 
+
