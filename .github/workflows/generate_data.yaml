@@ -100,7 +100,7 @@ jobs:
                 -PstageOSSRH \
                 -PdeployReleaseDataArtifacts \
                 -Dmaven.build.cache.enabled=false \
-                -D${{env.TINKAR_EXAMPLE_DATA_PROPERTIES}} 
+                -D${{env.DATA_PROPERTIES_VERSION}}  
                      
         env:
               MAVEN_USERNAME: ${{secrets.OSSRH_TOKEN_USER}}
