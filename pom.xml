@@ -66,6 +66,9 @@
         <!-- Logging dependencies -->
         <log4j.version>3.0.0-alpha1</log4j.version>
         <slf4j.version>2.0.13</slf4j.version>
+        <!-- Templating Plugin Version-->
+        <templating-maven-plugin.version>3.0.0</templating-maven-plugin.version>
+        <builder-helper-maven-plugin.version>3.6.0</builder-helper-maven-plugin.version>
     </properties>
 
     <modules>
@@ -213,6 +216,17 @@
                     <groupId>io.github.1tchy</groupId>
                     <artifactId>variable-search-replace-plugin</artifactId>
                     <version>${variable-search-replace-plugin.version}</version>
+                </plugin>
+                 <!-- Templating Plugin-->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>templating-maven-plugin</artifactId>
+                    <version>${templating-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${builder-helper-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
