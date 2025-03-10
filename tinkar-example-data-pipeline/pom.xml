@@ -152,7 +152,29 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+		</plugins>	
+	</build>
+
+	<profiles>
+	<!-- Generate Data Profile-->
+	 <profile>
+			<id>generateData</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>dev.ikm.maven.tinkar</groupId>
+						<artifactId>tinkar-example-data-maven-plugin</artifactId>
+						<executions>
+							<!-- Load example data into data store -->
+							<execution>
+								<id>generate-tinkar-example-data</id>
+								<goals>
+									<goal>generate-example-data</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
 				<groupId>dev.ikm.maven.tinkar</groupId>
 				<artifactId>tinkar-example-data-maven-plugin</artifactId>
 				<executions>
@@ -350,133 +372,6 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
-
-	<profiles>
-	<!-- Generate Data Profile-->
-	 <profile>
-			<id>generateData</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>dev.ikm.maven.tinkar</groupId>
-						<artifactId>tinkar-example-data-maven-plugin</artifactId>
-						<executions>
-							<!-- Load example data into data store -->
-							<execution>
-								<id>generate-tinkar-example-data</id>
-								<goals>
-									<goal>generate-example-data</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>dev.ikm.maven.tinkar</groupId>
-						<artifactId>tinkar-maven-plugin</artifactId>
-						<executions>
-							<!-- Export example data as a protocol buffers zip file -->
-							<execution>
-								<id>unreasoned-export</id>
-								<phase>compile</phase> <!-- Overriding default phase: force this execution before reasoning -->
-								<goals>
-									<goal>export-tinkar-data</goal>
-								</goals>
-								<configuration>
-									<exportDirectory>${project.build.directory}</exportDirectory>
-									<fileName>${data-artifact.prefix}-unreasoned-pb.zip</fileName>
-								</configuration>
-							</execution>
-							<!-- Run full reasoner starter data -->
-							<execution>
-								<id>full-reasoner</id>
-								<goals>
-									<goal>run-full-reasoner</goal>
-								</goals>
-							</execution>
-							<!-- Export starter data as a protocol buffers zip file -->
-							<execution>
-								<id>reasoned-export</id>
-								<goals>
-									<goal>export-tinkar-data</goal>
-								</goals>
-								<configuration>
-									<exportDirectory>${project.build.directory}</exportDirectory>
-									<fileName>${data-artifact.prefix}-reasoned-pb.zip</fileName>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<finalName>${data-artifact.prefix}</finalName>
-							<attach>false</attach>
-							<inlineDescriptors>
-								<inlineDescriptor>
-									<formats>
-										<format>zip</format>
-									</formats>
-									<fileSets>
-										<fileSet>
-											<directory>${project.build.directory}/${tinkar-starter-data.artifactId}-${tinkar-starter-data.version}-${tinkar-starter-data.classifier}</directory>
-											<includes>
-												<include>**</include>
-											</includes>
-											<excludes>
-												<exclude>lucene/**</exclude>
-											</excludes>
-										</fileSet>
-									</fileSets>
-									<includeBaseDirectory>false</includeBaseDirectory>
-								</inlineDescriptor>
-							</inlineDescriptors>
-						</configuration>
-						<executions>
-							<!-- Zip up unreasoned spinedarray database -->
-							<execution>
-								<id>unreasoned-sa-zip</id>
-								<phase>compile</phase> <!-- Overriding default phase: force this execution before reasoning -->
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<inlineDescriptors>
-										<inlineDescriptor>
-											<id>unreasoned-sa</id>
-											<fileSets>
-												<fileSet>
-													<outputDirectory>${data-artifact.prefix}-unreasoned-sa</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inlineDescriptor>
-									</inlineDescriptors>
-								</configuration>
-							</execution>
-							<!-- Zip up reasoned spinedarray database -->
-							<execution>
-								<phase>package</phase>
-								<id>reasoned-sa-zip</id>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<inlineDescriptors>
-										<inlineDescriptor>
-											<id>reasoned-sa</id>
-											<fileSets>
-												<fileSet>
-													<outputDirectory>${data-artifact.prefix}-reasoned-sa</outputDirectory>
-												</fileSet>
-											</fileSets>
-										</inlineDescriptor>
-									</inlineDescriptors>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
 					<!--POM Template Plugin Configuration-->
 					<plugin>
                         <groupId>org.codehaus.mojo</groupId>
