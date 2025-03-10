@@ -46,7 +46,6 @@
 	<properties>
 		<tinkar-example-data-properties.groupId>dev.ikm.maven.tinkar</tinkar-example-data-properties.groupId>
 		<tinkar-example-data-properties.artifactId>tinkar-example-data-properties</tinkar-example-data-properties.artifactId>
-		<!-- <tinkar-example-data-properties.version>1.0.0</tinkar-example-data-properties.version> -->
 		<tinkar-starter-data.groupId>dev.ikm.data.tinkar</tinkar-starter-data.groupId>
 		<tinkar-starter-data.artifactId>tinkar-starter-data</tinkar-starter-data.artifactId>
 		<tinkar-starter-data.classifier>unreasoned-sa</tinkar-starter-data.classifier>
