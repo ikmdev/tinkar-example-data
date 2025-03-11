@@ -152,7 +152,29 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+		</plugins>	
+	</build>
+
+	<profiles>
+	<!-- Generate Data Profile-->
+	 <profile>
+			<id>generateData</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>dev.ikm.maven.tinkar</groupId>
+						<artifactId>tinkar-example-data-maven-plugin</artifactId>
+						<executions>
+							<!-- Load example data into data store -->
+							<execution>
+								<id>generate-tinkar-example-data</id>
+								<goals>
+									<goal>generate-example-data</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
 				<groupId>dev.ikm.maven.tinkar</groupId>
 				<artifactId>tinkar-example-data-maven-plugin</artifactId>
 				<executions>
@@ -350,10 +372,28 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
+					<!--POM Template Plugin Configuration-->
+					<plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>templating-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>inject-maven-properties</id>
+                                <goals>
+                                    <goal>filter-sources</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDirectory>data-artifact-pom-template</sourceDirectory>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <skipPoms>false</skipPoms>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+				</plugins>
+			</build>
+		</profile>
 
-	<profiles>
 		<profile>
 			<id>deploySnapshotDataArtifacts</id>
 			<activation>
