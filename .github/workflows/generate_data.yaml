@@ -74,7 +74,7 @@ jobs:
                 -DskipTests \
                 -DskipITs \
                 -s '/home/runner/work/${{github.event.repository.name}}/${{github.event.repository.name}}/.m2/settings.xml'\
-                -DrepositoryId='${{ steps.version_verification.outputs.NEXUS_REPO_ID  }}' \
+                -DrepositoryId='maven-releases' \
                 -D${{env.DATA_PROPERTIES_VERSION}} 
   
       - name: Version Verification
@@ -86,8 +86,7 @@ jobs:
             fi
             
   
-      - name: Publish To OSSRH (Maven Central Staging)
-        if: steps.version_verification.outputs.NEXUS_REPO_ID == 'maven-releases' 
+      - name: Publish To OSSRH (Maven Central Staging) 
         run: |
              mvn deploy \
                 --batch-mode \
