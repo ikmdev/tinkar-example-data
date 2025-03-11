@@ -213,7 +213,6 @@
 	</build>
 
 	<profiles>
-	 	<!--Pom Template Profile-->
 	 	<profile>
 			<id>generateData</id>
 			<build>
