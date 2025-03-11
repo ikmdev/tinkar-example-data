@@ -124,22 +124,104 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<!-- Custom install each artifact using a different GAV configuration -->
 			<plugin>
-				<groupId>dev.ikm.maven.tinkar</groupId>
-				<artifactId>tinkar-example-data-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<groupId>${data-artifact.groupId}</groupId>
+					<artifactId>${data-artifact.artifactId}</artifactId>
+					<version>${data-artifact.version}</version>
+					<pomFile>${project.basedir}/pom.xml</pomFile>
+				</configuration>
 				<executions>
-					<!-- Load starter data into data store -->
 					<execution>
-						<id>generate-tinkar-example-data</id>
+						<id>install-properties-artifact</id>
 						<goals>
-							<goal>generate-example-data</goal>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<file>${tinkar-example-data-properties.path}</file>
+							<packaging>properties</packaging>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-unreasoned-sa-artifact</id>
+						<phase>install</phase>
+						<goals>
+							<goal>install-file</goal>
 						</goals>
 						<configuration>
-							<dataStore>${datastore.path}</dataStore>
+							<file>${data-artifact.path-prefix}-unreasoned-sa.zip</file>
+							<classifier>unreasoned-sa</classifier>
+							<packaging>zip</packaging>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-reasoned-sa-artifact</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<file>${data-artifact.path-prefix}-reasoned-sa.zip</file>
+							<classifier>reasoned-sa</classifier>
+							<packaging>zip</packaging>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-unreasoned-pb-artifact</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<file>${data-artifact.path-prefix}-unreasoned-pb.zip</file>
+							<classifier>unreasoned-pb</classifier>
+							<packaging>zip</packaging>
+						</configuration>
+					</execution>
+					<execution>
+						<id>install-reasoned-pb-artifact</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<file>${data-artifact.path-prefix}-reasoned-pb.zip</file>
+							<classifier>reasoned-pb</classifier>
+							<packaging>zip</packaging>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+	 	<!--Pom Template Profile-->
+	 	<profile>
+			<id>generateData</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>dev.ikm.maven.tinkar</groupId>
+						<artifactId>tinkar-example-data-maven-plugin</artifactId>
+						<executions>
+								<!-- Load starter data into data store -->
+							<execution>
+								<id>generate-tinkar-example-data</id>
+								<goals>
+									<goal>generate-example-data</goal>
+								</goals>
+								<configuration>
+									<dataStore>${datastore.path}</dataStore>
+								</configuration>
+							</execution>
+					</executions>
+				</plugin>
 			<plugin>
 				<groupId>dev.ikm.maven.tinkar</groupId>
 				<artifactId>tinkar-maven-plugin</artifactId>
@@ -250,82 +332,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Custom install each artifact using a different GAV configuration -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<configuration>
-					<groupId>${data-artifact.groupId}</groupId>
-					<artifactId>${data-artifact.artifactId}</artifactId>
-					<version>${data-artifact.version}</version>
-					<pomFile>${project.basedir}/pom.xml</pomFile>
-				</configuration>
-				<executions>
-					<execution>
-						<id>install-properties-artifact</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>install</phase>
-						<configuration>
-							<file>${tinkar-example-data-properties.path}</file>
-							<packaging>properties</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-unreasoned-sa-artifact</id>
-						<phase>install</phase>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<configuration>
-							<file>${data-artifact.path-prefix}-unreasoned-sa.zip</file>
-							<classifier>unreasoned-sa</classifier>
-							<packaging>zip</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-reasoned-sa-artifact</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>install</phase>
-						<configuration>
-							<file>${data-artifact.path-prefix}-reasoned-sa.zip</file>
-							<classifier>reasoned-sa</classifier>
-							<packaging>zip</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-unreasoned-pb-artifact</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>install</phase>
-						<configuration>
-							<file>${data-artifact.path-prefix}-unreasoned-pb.zip</file>
-							<classifier>unreasoned-pb</classifier>
-							<packaging>zip</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-reasoned-pb-artifact</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>install</phase>
-						<configuration>
-							<file>${data-artifact.path-prefix}-reasoned-pb.zip</file>
-							<classifier>reasoned-pb</classifier>
-							<packaging>zip</packaging>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
-	<profiles>
+		 </plugins>
+			</build>
+	 	</profile>
 		<profile>
 			<id>deploySnapshotDataArtifacts</id>
 			<activation>
