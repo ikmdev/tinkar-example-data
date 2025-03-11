@@ -73,7 +73,7 @@ jobs:
           git config user.name "ikmdevops"
           git config user.email 'devops@ikm.dev'
           git pull -p;
-          yq -i '.on.workflow_dispatch.inputs.tag_name.options = ["$LATEST-TAG"] + .on.workflow_dispatch.inputs.tag_name.options' .github/workflows/generate-data-pipeline.yaml
+          yq -i '.on.workflow_dispatch.inputs.tag_name.options = ["$LATEST-TAG"] + .on.workflow_dispatch.inputs.tag_name.options' .github/workflows/generate_data.yaml
           git commit -am"Updated Generate Data Pipeline With $LATEST-TAG"
           git push
             
