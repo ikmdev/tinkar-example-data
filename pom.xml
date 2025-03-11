@@ -242,7 +242,7 @@
                 </snapshotRepository>
             </distributionManagement>
             <properties>
-                <repositoryId>local-release</repositoryId>
+                <repositoryId>local-snapshot</repositoryId>
                 <deployRepositoryUrl>file:${project.build.directory}/local_deploy_repo/snapshot</deployRepositoryUrl>
             </properties>
         </profile>

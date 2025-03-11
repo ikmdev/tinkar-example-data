@@ -133,9 +133,20 @@
 					<groupId>${data-artifact.groupId}</groupId>
 					<artifactId>${data-artifact.artifactId}</artifactId>
 					<version>${data-artifact.version}</version>
-					<pomFile>${project.basedir}/pom.xml</pomFile>
+					<pomFile>${project.build.directory}/data-artifact-pom.xml</pomFile>
 				</configuration>
 				<executions>
+					<execution>
+						<id>install-properties-artifact</id>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<phase>install</phase>
+						<configuration>
+							<file>${tinkar-example-data-properties.path}</file>
+							<packaging>properties</packaging>
+						</configuration>
+					</execution>
 					<execution>
 						<id>install-pipeline-definition</id>
 						<phase>install</phase>
@@ -146,17 +157,6 @@
 							<file>${project.basedir}/pom.xml</file>
 							<classifier>pipeline</classifier>
 							<packaging>xml</packaging>
-						</configuration>
-					</execution>
-					<execution>
-						<id>install-properties-artifact</id>
-						<goals>
-							<goal>install-file</goal>
-						</goals>
-						<phase>install</phase>
-						<configuration>
-							<file>${tinkar-example-data-properties.path}</file>
-							<packaging>properties</packaging>
 						</configuration>
 					</execution>
 					<execution>
@@ -253,6 +253,9 @@
 			<plugin>
 				<groupId>dev.ikm.maven.tinkar</groupId>
 				<artifactId>tinkar-maven-plugin</artifactId>
+				<configuration>
+					<dataStore>${datastore.path}</dataStore>
+				</configuration>
 				<executions>
 					<!-- Export starter data as a protocol buffers zip file -->
 					<execution>
@@ -262,7 +265,6 @@
 							<goal>export-tinkar-data</goal>
 						</goals>
 						<configuration>
-							<dataStore>${datastore.path}</dataStore>
 							<exportDirectory>${project.build.directory}</exportDirectory>
 							<fileName>${data-artifact.prefix}-unreasoned-pb.zip</fileName>
 						</configuration>
@@ -273,9 +275,6 @@
 						<goals>
 							<goal>run-full-reasoner</goal>
 						</goals>
-						<configuration>
-							<dataStore>${datastore.path}</dataStore>
-						</configuration>
 					</execution>
 					<!-- Export starter data as a protocol buffers zip file -->
 					<execution>
@@ -284,7 +283,6 @@
 							<goal>export-tinkar-data</goal>
 						</goals>
 						<configuration>
-							<dataStore>${datastore.path}</dataStore>
 							<exportDirectory>${project.build.directory}</exportDirectory>
 							<fileName>${data-artifact.prefix}-reasoned-pb.zip</fileName>
 						</configuration>
