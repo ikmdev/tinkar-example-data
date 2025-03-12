@@ -24,7 +24,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.eclipse.collections.api.factory.Lists;
 
+import java.io.InputStream;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.ikm.tinkar.terms.TinkarTerm.*;
 
@@ -49,11 +51,12 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
             SAMPLE_TINKAR_DATA = createConcept(
                     "Tinkar Sample Data",
                     "67af3d9d-2d32-4036-9861-c052f3174134",
-                    TINKAR_MODEL_CONCEPT);
+                    new Concept[] {TINKAR_MODEL_CONCEPT});
 
             createPatternOne();
             createPatternTwo();
-
+            createPatternThree();
+            createSampleHierarchy();
             composer.commitSession(session);
         } finally {
             EntityService.get().endLoadPhase();
@@ -194,11 +197,145 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                 )));
     }
 
-    private Concept createConcept(String description, String uuidStr) {
-        return createConcept(description, uuidStr, SAMPLE_TINKAR_DATA);
+    private void createPatternThree() {
+        EntityProxy.Pattern EXAMPLE_PATTERN_THREE = EntityProxy.Pattern.make("Tinkar Semantic Test Pattern 3", PublicIds.newRandom());
+        EntityProxy.Concept EXAMPLE_MEANING = createConcept("A test pattern for image data type", PublicIds.newRandom().asUuidArray()[0].toString());
+        EntityProxy.Concept IMAGE_FIELD_MEANING = createConcept("An example image field", PublicIds.newRandom().asUuidArray()[0].toString());
+
+
+        session.compose((PatternAssembler patternAssembler) -> patternAssembler.pattern(EXAMPLE_PATTERN_THREE)
+                        .meaning(EXAMPLE_MEANING)
+                        .purpose(EXAMPLE_MEANING)
+                        .fieldDefinition(
+                                IMAGE_FIELD_MEANING,
+                                IMAGE_FIELD_MEANING,
+                                BYTE_ARRAY_FIELD))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(EXAMPLE_PATTERN_THREE.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .text(EXAMPLE_PATTERN_THREE.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Definition definition) -> definition
+                        .text("An example pattern for Tinkar Image data type")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE));
+
+        // transform image to byte[]
+        AtomicReference<byte[]> bytes = new AtomicReference<>();
+        try {
+            InputStream is = this.getClass().getResourceAsStream("/300px-HeartChambers.png");
+            if (is == null) {
+                throw new Exception("Unable to load 300px-HeartChambers.png");
+            }
+            byte[] byte_array = is.readAllBytes();
+            is.close();
+            bytes.set(byte_array);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        EntityProxy.Concept CONCEPT_FOR_SEMANTIC_1 = createConcept("First Semantic for Sample Pattern 3", PublicIds.newRandom().asUuidArray()[0].toString());
+
+        // The UUID needs to be hardcoded as follows until komet is fixed to generically process image types
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .semantic(EntityProxy.Semantic.make(PublicIds.of("f43030a5-2324-4880-9292-c7d3c16b58d3")))
+                .pattern(EXAMPLE_PATTERN_THREE)
+                .reference(CONCEPT_FOR_SEMANTIC_1)
+                .fieldValues(objects -> objects.addAll(
+                        Lists.mutable.of(bytes.get()))));
     }
 
-    private Concept createConcept(String description, String uuidStr, Concept parent) {
+    private void createSampleHierarchy() {
+                    /*
+
+            G-G-G-G-GP          1  2
+                                \  /
+            G-G-G-GP              1   2
+                                   \ /
+            G-G-GP                  2   3
+                                    |   |
+            G-GP                1   2   3
+                                |   | \ |
+            GP                  1   2   3
+                                |  / \  /
+            P                   1  2   3
+                                 \ |  /
+            Self (ConceptA)        A
+                                  / \
+            C                    1   2
+                                / \  |
+            GC                 1  2  3
+            */
+
+        // Great-great-great-great-grandparent generation
+        EntityProxy.Concept proxy = EntityProxy.Concept.make("GGGGGrandParent_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept ggggGrandparent1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString());
+        proxy = EntityProxy.Concept.make("GGGGGrandParent_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept ggggGrandparent2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString());
+
+        // Great-great-great-grandparent generation
+        proxy = EntityProxy.Concept.make("GGGGrandParent_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept gggGrandparent1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{ggggGrandparent1, ggggGrandparent2});
+        proxy = EntityProxy.Concept.make("GGGGrandParent_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept gggGrandparent2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString());
+
+        // Great-great-grandparent generation
+        proxy = EntityProxy.Concept.make("GGGrandParent_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept ggGrandparent2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{gggGrandparent1, gggGrandparent2});
+        proxy = EntityProxy.Concept.make("GGGrandParent_3", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept ggGrandparent3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString());
+
+        // Great-grandparent generation
+        proxy = EntityProxy.Concept.make("GGrandParent_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept gGrandparent1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString());
+        proxy = EntityProxy.Concept.make("GGrandParent_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept gGrandparent2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{ggGrandparent2});
+        proxy = EntityProxy.Concept.make("GGrandParent_3", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept gGrandparent3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{ggGrandparent3});
+
+        // Grandparent generation
+        proxy = EntityProxy.Concept.make("GrandParent_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept grandparent1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{gGrandparent1});
+        proxy = EntityProxy.Concept.make("GrandParent_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept grandparent2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{gGrandparent2});
+        proxy = EntityProxy.Concept.make("GrandParent_3", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept grandparent3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{gGrandparent2, gGrandparent3});
+
+        // Parent generation
+        proxy = EntityProxy.Concept.make("Parent_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept parent1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{grandparent1});
+        proxy = EntityProxy.Concept.make("Parent_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept parent2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{grandparent2});
+        proxy = EntityProxy.Concept.make("Parent_3", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept parent3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{grandparent2, grandparent3});
+
+        // Self
+        proxy = EntityProxy.Concept.make("ConceptA", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept conceptA = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{parent1, parent2, parent3});
+
+        // Child generation
+        proxy = EntityProxy.Concept.make("Child_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept child1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{conceptA});
+        proxy = EntityProxy.Concept.make("Child_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept child2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{conceptA});
+
+        // Grandchild generation
+        proxy = EntityProxy.Concept.make("GrandChild_1", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept grandchild1 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{child1});
+        proxy = EntityProxy.Concept.make("GrandChild_2", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept grandchild2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{child1});
+        proxy = EntityProxy.Concept.make("GrandChild_3", PublicIds.newRandom().asUuidArray()[0]);
+        EntityProxy.Concept grandchild3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{child2});
+    }
+
+    private Concept createConcept(String description, String uuidStr) {
+        return createConcept(description, uuidStr, new Concept[] {SAMPLE_TINKAR_DATA});
+    }
+
+    private Concept createConcept(String description, String uuidStr, Concept[] parent) {
         Concept concept = Concept.make(description, UUID.fromString(uuidStr));
         session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(concept))
                 .attach((FullyQualifiedName fqn) -> fqn
