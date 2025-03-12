@@ -69,7 +69,7 @@ jobs:
 
       - name: Update Dropdown
         run: |
-          echo LATEST-TAG=$(git describe --tags $(git rev-list --tags --max-count=1)) >> $GITHUB_OUTPUT
+          echo LATEST-TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           git config user.name "ikmdevops"
           git config user.email 'devops@ikm.dev'
           git pull -p;
