@@ -8,8 +8,11 @@ import dev.ikm.tinkar.composer.Session;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
 import dev.ikm.tinkar.composer.assembler.PatternAssembler;
 import dev.ikm.tinkar.composer.assembler.SemanticAssembler;
+import dev.ikm.tinkar.composer.template.AxiomSyntax;
+import dev.ikm.tinkar.composer.template.Comment;
 import dev.ikm.tinkar.composer.template.Definition;
 import dev.ikm.tinkar.composer.template.FullyQualifiedName;
+import dev.ikm.tinkar.composer.template.GBDialect;
 import dev.ikm.tinkar.composer.template.Identifier;
 import dev.ikm.tinkar.composer.template.StatedAxiom;
 import dev.ikm.tinkar.composer.template.StatedNavigation;
@@ -25,6 +28,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.eclipse.collections.api.factory.Lists;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,17 +37,18 @@ import static dev.ikm.tinkar.terms.TinkarTerm.*;
 @Mojo(name = "generate-example-data", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.COMPILE)
 public class TinkarExampleDataMojo extends SimpleTinkarMojo {
 
+    private final long currentTimeMillis = System.currentTimeMillis();
     private Session session;
     private Concept SAMPLE_TINKAR_DATA;
 
     @Override
-    public void run() throws Exception {
+    public void run() {
         EntityService.get().beginLoadPhase();
         try {
             Composer composer = new Composer("Tinkar Example Data Composer");
             session = composer.open(
                     State.ACTIVE,
-                    System.currentTimeMillis(),
+                    currentTimeMillis,
                     USER,
                     DEVELOPMENT_MODULE,
                     DEVELOPMENT_PATH);
@@ -57,6 +62,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
             createPatternTwo();
             createPatternThree();
             createSampleHierarchy();
+            createExampleSemanticForRemainingPatterns();
             composer.commitSession(session);
         } finally {
             EntityService.get().endLoadPhase();
@@ -329,6 +335,66 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
         EntityProxy.Concept grandchild2 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{child1});
         proxy = EntityProxy.Concept.make("GrandChild_3", PublicIds.newRandom().asUuidArray()[0]);
         EntityProxy.Concept grandchild3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{child2});
+    }
+
+    private void createExampleSemanticForRemainingPatterns() {
+        String conceptDescription = "Concept for Example Semantics";
+        EntityProxy.Concept conceptWithExampleSemantics = EntityProxy.Concept.make(conceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(conceptDescription.getBytes())));
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptWithExampleSemantics))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(conceptDescription + "- US FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(conceptDescription + "- GB FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(new GBDialect().acceptability(PREFERRED)))
+                .attach((Synonym synonym) -> synonym
+                        .text(conceptDescription + "- US Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(conceptDescription + "- GB Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(new GBDialect().acceptability(PREFERRED)))
+                .attach((Definition definition) -> definition
+                        .text("This is the Concept used to aggregate additional example Semantics. Example Semantics are intended to provide at least one example Semantic for each Pattern in in the tinkar-starter-data dataset. The additional example Semantics for this Concept are intended to exercise any remaining Patterns.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(conceptWithExampleSemantics.asUuidArray()[0].toString()))
+                .attach((StatedNavigation statedNavigation) -> statedNavigation
+                        .parents(SAMPLE_TINKAR_DATA))
+                .attach((StatedAxiom statedAxiom) -> statedAxiom
+                        .isA(SAMPLE_TINKAR_DATA))
+                .attach((Comment comment) -> comment
+                        .text("This is an example Comment."))
+                .attach((AxiomSyntax owlAxiom) -> owlAxiom
+                        .text(String.format("SubClassOf(:[%s] :[%s])", conceptWithExampleSemantics.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0])));
+
+        // Add Solor Concept Assemblage Membership Semantic
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(SOLOR_CONCEPT_ASSEMBLAGE)
+                .reference(conceptWithExampleSemantics)
+                .fieldValues(List::clear));
+
+        // Add Value Constraint Pattern Semantic
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(VALUE_CONSTRAINT_PATTERN)
+                .reference(conceptWithExampleSemantics)
+                .fieldValues(fieldVals -> fieldVals
+                        .with(ROOT_VERTEX)
+                        .with(GREATER_THAN_OR_EQUAL_TO)
+                        .with(0.0)
+                        .with(LESS_THAN)
+                        .with(11.11)
+                        .with("Example Units")));
     }
 
     private Concept createConcept(String description, String uuidStr) {
