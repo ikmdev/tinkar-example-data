@@ -101,6 +101,8 @@ jobs:
                 -DrepositoryIdOSSRH='true' \
                 -PstageOSSRH \
                 -PdeployReleaseDataArtifacts \
+                -Dmaven.deploy.skip=true \
+                -DskipNexusStagingDeployMojo=true \
                 -Dmaven.build.cache.enabled=false \
                 -D${{env.DATA_PROPERTIES_VERSION}}  
                      
