@@ -67,12 +67,16 @@ jobs:
           java_version: '21'
           mvn_additional_args: '-Dtinkar-example-data-properties.version=1.1.0'
 
-#      - name: Update Dropdown
-#        run: |
-#          echo LATEST-TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
-#          git config user.name "ikmdevops"
-#          git config user.email 'devops@ikm.dev'
-#          git pull -p;
-#          yq -i '.on.workflow_dispatch.inputs.tag_name.options = ["$LATEST-TAG"] + .on.workflow_dispatch.inputs.tag_name.options' .github/workflows/generate_data.yaml
-#          git commit -am"Updated Generate Data Pipeline With $LATEST-TAG"
-#          git push
+      - name: Update Dropdown
+        run: |
+          echo LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          git config user.name "ikmdevops"
+          git config user.email 'devops@ikm.dev'
+          git pull -p
+          echo "Adding $LATEST_TAG tag to choice dropdown for users attempting to generate data"
+          yq -i '.on.workflow_dispatch.inputs.tag_name.options = ["$LATEST_TAG"] + .on.workflow_dispatch.inputs.tag_name.options' .github/workflows/generate_data.yaml
+          git diff -U1 | grep -E "\-\-\-|\- $LATEST_TAG" -B2 -A1 | grep -v "^--$" > add_tag_choice.patch
+          git restore .
+          git apply add_tag_choice.patch
+          git commit -am"Updated Generate Data Pipeline With $LATEST_TAG"
+          git push
