@@ -326,7 +326,7 @@
 					<!-- Zip up unreasoned spinedarray database -->
 					<execution>
 						<id>unreasoned-sa-zip</id>
-						<phase>compile</phase> <!-- Overriding default phase: force this execution before reasoning -->
+						<phase>process-classes</phase> <!-- Overriding default phase: force this execution before reasoning -->
 						<goals>
 							<goal>single</goal>
 						</goals>
