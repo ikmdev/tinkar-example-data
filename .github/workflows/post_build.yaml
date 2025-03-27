@@ -39,4 +39,4 @@ jobs:
             sonarcloud_token: ${{ secrets.SONAR_TOKEN }}
             sonarcloud_tests: ${{ '' }}
             java_version: '21'
-            mvn_additional_args: '-Dtinkar-example-data-properties.version=1.0.0'
+            mvn_additional_args: '-Dtinkar-example-data-properties.version=1.1.1'
