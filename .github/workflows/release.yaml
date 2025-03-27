@@ -75,7 +75,7 @@ jobs:
           git config user.email 'devops@ikm.dev'
           git pull -p
           echo "Adding $LATEST_TAG tag to choice dropdown for users attempting to generate data"
-          yq -i '.on.workflow_dispatch.inputs.tag_name.options = ["$LATEST_TAG"] + .on.workflow_dispatch.inputs.tag_name.options' .github/workflows/generate_data.yaml
+          yq -i ".on.workflow_dispatch.inputs.tag_name.options = [\"$LATEST_TAG\"] + .on.workflow_dispatch.inputs.tag_name.options" .github/workflows/generate_data.yaml
           git diff -U1 | grep -E "\-\-\-|\- $LATEST_TAG" -B2 -A1 | grep -v "^--$" > add_tag_choice.patch
           git restore .
           git apply add_tag_choice.patch
