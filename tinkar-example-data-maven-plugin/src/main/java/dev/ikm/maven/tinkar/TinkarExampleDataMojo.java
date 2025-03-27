@@ -48,6 +48,7 @@ import static dev.ikm.tinkar.terms.TinkarTerm.INACTIVE_STATE;
 import static dev.ikm.tinkar.terms.TinkarTerm.INTEGER_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.LESS_THAN;
 import static dev.ikm.tinkar.terms.TinkarTerm.PREFERRED;
+import static dev.ikm.tinkar.terms.TinkarTerm.PRIMORDIAL_STATE;
 import static dev.ikm.tinkar.terms.TinkarTerm.ROLE_GROUP;
 import static dev.ikm.tinkar.terms.TinkarTerm.ROOT_VERTEX;
 import static dev.ikm.tinkar.terms.TinkarTerm.SOLOR_CONCEPT_ASSEMBLAGE;
@@ -439,17 +440,17 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         .text(String.format("SubClassOf(:[%s] ObjectIntersectionOf(:[%s] ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s]))))",
                                 parentConceptForAxiomChangeTest.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], ACTIVE_STATE.asUuidArray()[0])));
 
-        String childConceptDescription = "Child Concept for Axiom Change Test";
-        EntityProxy.Concept childConceptForAxiomChangeTest = EntityProxy.Concept.make(childConceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(childConceptDescription.getBytes())));
+        String child1ConceptDescription = "Child 1 Concept for Axiom Change Test";
+        EntityProxy.Concept child1ConceptForAxiomChangeTest = EntityProxy.Concept.make(child1ConceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(child1ConceptDescription.getBytes())));
 
-        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(childConceptForAxiomChangeTest))
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(child1ConceptForAxiomChangeTest))
                 .attach((FullyQualifiedName fqn) -> fqn
-                        .text(childConceptDescription + " - FQN")
+                        .text(child1ConceptDescription + " - FQN")
                         .language(ENGLISH_LANGUAGE)
                         .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
                         .attach(usDialect()))
                 .attach((Synonym synonym) -> synonym
-                        .text(childConceptDescription + " - Synonym")
+                        .text(child1ConceptDescription + " - Synonym")
                         .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
                         .language(ENGLISH_LANGUAGE)
                         .attach(usDialect()))
@@ -459,10 +460,35 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         .language(ENGLISH_LANGUAGE))
                 .attach((Identifier identifier) -> identifier
                         .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
-                        .identifier(childConceptForAxiomChangeTest.asUuidArray()[0].toString()))
+                        .identifier(child1ConceptForAxiomChangeTest.asUuidArray()[0].toString()))
                 .attach((AxiomSyntax owlAxiom) -> owlAxiom
                         .text(String.format("SubClassOf(:[%s] ObjectIntersectionOf(:[%s] ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s])) ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s]))))",
-                                childConceptForAxiomChangeTest.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], ACTIVE_STATE.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], INACTIVE_STATE.asUuidArray()[0])));
+                                child1ConceptForAxiomChangeTest.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], ACTIVE_STATE.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], PRIMORDIAL_STATE.asUuidArray()[0])));
+
+        String child2ConceptDescription = "Child 2 Concept for Axiom Change Test";
+        EntityProxy.Concept child2ConceptForAxiomChangeTest = EntityProxy.Concept.make(child2ConceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(child2ConceptDescription.getBytes())));
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(child2ConceptForAxiomChangeTest))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(child2ConceptDescription + " - FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(child2ConceptDescription + " - Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Definition definition) -> definition
+                        .text("This is the Concept used for testing reasoning capabilities and logical axiom changes.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(child2ConceptForAxiomChangeTest.asUuidArray()[0].toString()))
+                .attach((AxiomSyntax owlAxiom) -> owlAxiom
+                        .text(String.format("SubClassOf(:[%s] ObjectIntersectionOf(:[%s] ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s])) ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s]))))",
+                                child2ConceptForAxiomChangeTest.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], ACTIVE_STATE.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], INACTIVE_STATE.asUuidArray()[0])));
     }
 
     private void createExampleSemanticForRemainingPatterns() {
