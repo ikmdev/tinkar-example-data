@@ -257,10 +257,17 @@
 					<dataStore>${datastore.path}</dataStore>
 				</configuration>
 				<executions>
-					<!-- Export starter data as a protocol buffers zip file -->
+					<!-- Run OWL Transformer -->
+					<execution>
+						<id>owl-transform</id>
+						<goals>
+							<goal>run-owl-transformer</goal>
+						</goals>
+					</execution>
+					<!-- Export data as a protocol buffers zip file -->
 					<execution>
 						<id>unreasoned-export</id>
-						<phase>compile</phase> <!-- Overriding default phase: force this execution before reasoning -->
+						<phase>process-classes</phase> <!-- Overriding default phase to force this execution before reasoning -->
 						<goals>
 							<goal>export-tinkar-data</goal>
 						</goals>
@@ -269,14 +276,14 @@
 							<fileName>${data-artifact.prefix}-unreasoned-pb.zip</fileName>
 						</configuration>
 					</execution>
-					<!-- Run full reasoner starter data -->
+					<!-- Run full reasoner -->
 					<execution>
 						<id>full-reasoner</id>
 						<goals>
 							<goal>run-full-reasoner</goal>
 						</goals>
 					</execution>
-					<!-- Export starter data as a protocol buffers zip file -->
+					<!-- Export data as a protocol buffers zip file -->
 					<execution>
 						<id>reasoned-export</id>
 						<goals>
