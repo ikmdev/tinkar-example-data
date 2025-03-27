@@ -32,7 +32,30 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static dev.ikm.tinkar.terms.TinkarTerm.*;
+import static dev.ikm.tinkar.terms.TinkarTerm.ACTIVE_STATE;
+import static dev.ikm.tinkar.terms.TinkarTerm.BOOLEAN_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.BYTE_ARRAY_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_LIST_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_SET_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_NOT_CASE_SENSITIVE;
+import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_MODULE;
+import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_PATH;
+import static dev.ikm.tinkar.terms.TinkarTerm.ENGLISH_LANGUAGE;
+import static dev.ikm.tinkar.terms.TinkarTerm.FLOAT_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.GREATER_THAN_OR_EQUAL_TO;
+import static dev.ikm.tinkar.terms.TinkarTerm.INACTIVE_STATE;
+import static dev.ikm.tinkar.terms.TinkarTerm.INTEGER_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.LESS_THAN;
+import static dev.ikm.tinkar.terms.TinkarTerm.PREFERRED;
+import static dev.ikm.tinkar.terms.TinkarTerm.ROLE_GROUP;
+import static dev.ikm.tinkar.terms.TinkarTerm.ROOT_VERTEX;
+import static dev.ikm.tinkar.terms.TinkarTerm.SOLOR_CONCEPT_ASSEMBLAGE;
+import static dev.ikm.tinkar.terms.TinkarTerm.STRING;
+import static dev.ikm.tinkar.terms.TinkarTerm.TINKAR_MODEL_CONCEPT;
+import static dev.ikm.tinkar.terms.TinkarTerm.UNIVERSALLY_UNIQUE_IDENTIFIER;
+import static dev.ikm.tinkar.terms.TinkarTerm.USER;
+import static dev.ikm.tinkar.terms.TinkarTerm.VALUE_CONSTRAINT_PATTERN;
 
 @Mojo(name = "generate-example-data", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.COMPILE)
 public class TinkarExampleDataMojo extends SimpleTinkarMojo {
@@ -62,6 +85,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
             createPatternTwo();
             createPatternThree();
             createSampleHierarchy();
+            createAxiomChangeTest();
             createExampleSemanticForRemainingPatterns();
             composer.commitSession(session);
         } finally {
@@ -337,28 +361,132 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
         EntityProxy.Concept grandchild3 = createConcept(proxy.description(), proxy.asUuidArray()[0].toString(), new EntityProxy.Concept[]{child2});
     }
 
+    private void createAxiomChangeTest() {
+        String roleParentConceptDescription = "Role Parent Concept for Axiom Change Test";
+        EntityProxy.Concept roleParentConceptForAxiomChangeTest = EntityProxy.Concept.make(roleParentConceptDescription,
+                PublicIds.of(UUID.nameUUIDFromBytes(roleParentConceptDescription.getBytes()),
+                        // TODO: Remove forced UUID after tinkar-core / reasoner updates
+                        UUID.fromString("3af1c784-8a62-59e5-82e7-767de930843b"))); // Force UUID of Concept Model Object Attribute
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(roleParentConceptForAxiomChangeTest))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(roleParentConceptDescription + " - FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(roleParentConceptDescription + " - Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Definition definition) -> definition
+                        .text("This is the Concept used to represent the Concept Model Object Attribute.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(roleParentConceptForAxiomChangeTest.asUuidArray()[0].toString()))
+                .attach((StatedNavigation statedNav) -> statedNav.parents(SAMPLE_TINKAR_DATA))
+                .attach((StatedAxiom statedAxiom) -> statedAxiom.isA(SAMPLE_TINKAR_DATA));
+
+        String roleConceptDescription = "Role Concept for Axiom Change Test";
+        EntityProxy.Concept roleConceptForAxiomChangeTest = EntityProxy.Concept.make(roleConceptDescription,
+                PublicIds.of(UUID.nameUUIDFromBytes(roleConceptDescription.getBytes())));
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(roleConceptForAxiomChangeTest))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(roleConceptDescription + " - FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(roleConceptDescription + " - Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Definition definition) -> definition
+                        .text("This is the Concept used for testing reasoning capabilities and logical axiom changes.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(roleConceptForAxiomChangeTest.asUuidArray()[0].toString()))
+                .attach((AxiomSyntax owlAxiom) -> owlAxiom
+                        .text(String.format("SubObjectPropertyOf(:[%s] :[%s])", roleConceptForAxiomChangeTest.asUuidArray()[0], roleParentConceptForAxiomChangeTest.asUuidArray()[0])));
+
+        String parentConceptDescription = "Parent Concept for Axiom Change Test";
+        EntityProxy.Concept parentConceptForAxiomChangeTest = EntityProxy.Concept.make(parentConceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(parentConceptDescription.getBytes())));
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(parentConceptForAxiomChangeTest))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(parentConceptDescription + " - FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(parentConceptDescription + " - Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Definition definition) -> definition
+                        .text("This is the Concept used for testing reasoning capabilities and logical axiom changes.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(parentConceptForAxiomChangeTest.asUuidArray()[0].toString()))
+                .attach((AxiomSyntax owlAxiom) -> owlAxiom
+                        .text(String.format("SubClassOf(:[%s] ObjectIntersectionOf(:[%s] ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s]))))",
+                                parentConceptForAxiomChangeTest.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], ACTIVE_STATE.asUuidArray()[0])));
+
+        String childConceptDescription = "Child Concept for Axiom Change Test";
+        EntityProxy.Concept childConceptForAxiomChangeTest = EntityProxy.Concept.make(childConceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(childConceptDescription.getBytes())));
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(childConceptForAxiomChangeTest))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(childConceptDescription + " - FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(childConceptDescription + " - Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Definition definition) -> definition
+                        .text("This is the Concept used for testing reasoning capabilities and logical axiom changes.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(childConceptForAxiomChangeTest.asUuidArray()[0].toString()))
+                .attach((AxiomSyntax owlAxiom) -> owlAxiom
+                        .text(String.format("SubClassOf(:[%s] ObjectIntersectionOf(:[%s] ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s])) ObjectSomeValuesFrom(:[%s] ObjectSomeValuesFrom(:[%s] :[%s]))))",
+                                childConceptForAxiomChangeTest.asUuidArray()[0], SAMPLE_TINKAR_DATA.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], ACTIVE_STATE.asUuidArray()[0], ROLE_GROUP.asUuidArray()[1], roleConceptForAxiomChangeTest.asUuidArray()[0], INACTIVE_STATE.asUuidArray()[0])));
+    }
+
     private void createExampleSemanticForRemainingPatterns() {
         String conceptDescription = "Concept for Example Semantics";
         EntityProxy.Concept conceptWithExampleSemantics = EntityProxy.Concept.make(conceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(conceptDescription.getBytes())));
 
         session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptWithExampleSemantics))
                 .attach((FullyQualifiedName fqn) -> fqn
-                        .text(conceptDescription + "- US FQN")
+                        .text(conceptDescription + " - US FQN")
                         .language(ENGLISH_LANGUAGE)
                         .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
                         .attach(usDialect()))
                 .attach((FullyQualifiedName fqn) -> fqn
-                        .text(conceptDescription + "- GB FQN")
+                        .text(conceptDescription + " - GB FQN")
                         .language(ENGLISH_LANGUAGE)
                         .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
                         .attach(new GBDialect().acceptability(PREFERRED)))
                 .attach((Synonym synonym) -> synonym
-                        .text(conceptDescription + "- US Synonym")
+                        .text(conceptDescription + " - US Synonym")
                         .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
                         .language(ENGLISH_LANGUAGE)
                         .attach(usDialect()))
                 .attach((Synonym synonym) -> synonym
-                        .text(conceptDescription + "- GB Synonym")
+                        .text(conceptDescription + " - GB Synonym")
                         .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
                         .language(ENGLISH_LANGUAGE)
                         .attach(new GBDialect().acceptability(PREFERRED)))
