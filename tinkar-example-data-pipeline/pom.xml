@@ -260,6 +260,7 @@
 					<!-- Run OWL Transformer -->
 					<execution>
 						<id>owl-transform</id>
+						<phase>compile</phase>
 						<goals>
 							<goal>run-owl-transformer</goal>
 						</goals>
@@ -267,7 +268,7 @@
 					<!-- Export data as a protocol buffers zip file -->
 					<execution>
 						<id>unreasoned-export</id>
-						<phase>process-classes</phase> <!-- Overriding default phase to force this execution before reasoning -->
+						<phase>compile</phase> <!-- Overriding default phase to force this execution before reasoning -->
 						<goals>
 							<goal>export-tinkar-data</goal>
 						</goals>
@@ -326,7 +327,7 @@
 					<!-- Zip up unreasoned spinedarray database -->
 					<execution>
 						<id>unreasoned-sa-zip</id>
-						<phase>process-classes</phase> <!-- Overriding default phase: force this execution before reasoning -->
+						<phase>compile</phase> <!-- Overriding default phase: force this execution before reasoning -->
 						<goals>
 							<goal>single</goal>
 						</goals>
