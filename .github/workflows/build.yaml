@@ -24,16 +24,10 @@ jobs:
     steps:      
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
-      - uses: actions/setup-java@v4
-        with:
-            java-version: '21'
-            distribution: 'zulu'
           
       - name: Build IKMDEV Code
         uses: ikmdev/maven-clean-install-build-action@v3.3.0
         with:
           branch_name: ${{github.ref_name}}
-          java_version: '21'
           mvn_additional_args: '-Dtinkar-example-data-properties.version=1.1.1'
          
