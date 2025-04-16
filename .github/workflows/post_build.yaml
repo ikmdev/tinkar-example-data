@@ -11,26 +11,35 @@ on:
 
 permissions:
   contents: write 
+
+env:
+  BRANCH_NAME: ${{github.event.workflow_run.head_branch}}
         
 jobs:
   post-build:
     name: Post Build Actions
     runs-on: ubuntu-24.04
     if: github.event.workflow_run.conclusion == 'success' && github.repository_owner == 'ikmdev'
+    outputs:
+      ARTIFACT_ID: ${{steps.artifact_id_property.outputs.ARTIFACT_ID}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{github.event.workflow_run.head_repository.full_name}}
+          repository: ${{env.BRANCH_NAME}}
           ref: ${{github.event.workflow_run.head_branch}}
           fetch-depth: 0
+
+      - name: Get Artifact ID Property
+        id: artifact_id_property
+        run: echo "ARTIFACT_ID=$(mvn help:evaluate -D'expression=project.artifactId' -q -D'forceStdout')" >> $GITHUB_OUTPUT
           
       - name: IKMDEV Post Build Action
         id: ikmdev_post_build
         uses: ikmdev/maven-post-build-action@v2.2.0
         with:
             nexus_repo_password: ${{secrets.EC2_NEXUS_PASSWORD}}
-            branch_name: ${{github.event.workflow_run.head_branch}}
+            branch_name: ${{env.BRANCH_NAME}}
             github_token: ${{secrets.GITHUB_TOKEN}}
             ossrh_username: ${{secrets.OSSRH_TOKEN_USER}}
             ossrh_token: ${{secrets.OSSRH_TOKEN_PASS}}
@@ -40,3 +49,21 @@ jobs:
             sonarcloud_tests: ${{ '' }}
             java_version: '23'
             mvn_additional_args: '-Dtinkar-example-data-properties.version=1.1.1'
+
+
+  repository-dispatch:
+    name: Repository Dispatch
+    needs: post-build
+    if: needs.post-build.outputs.IS_TAG == 'true'
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        repos: [data-properties]
+    steps:
+        - name: Trigger Repository Dispatch
+          run: |
+            curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{secrets.IKMDEVOPS_PAT_TOKEN}}" \
+            https://api.github.com/repos/ikmdev/${{matrix.repos}}/dispatches \
+            -d '{"event_type":"tinkar-trigger","client_payload":{"artifactID": "${{needs.post-build.outputs.ARTIFACT_ID}}", "version":"${{env.BRANCH_NAME}}"}}'
