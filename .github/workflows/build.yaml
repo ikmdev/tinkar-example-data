@@ -28,6 +28,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+        
+      # If triggered by resository_dispatch then 
+      # updates the TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION GitHub Variable
       - name: Update tinkar-example-data-properties version
         if: github.event_name == 'repository_dispatch'
         run: gh variable set TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION --body "${{github.event.client_payload.version}}"
