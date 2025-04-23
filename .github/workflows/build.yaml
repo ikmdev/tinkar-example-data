@@ -38,5 +38,5 @@ jobs:
         uses: ikmdev/maven-clean-install-build-action@v3.3.0
         with:
           branch_name: ${{github.ref_name}}
-          mvn_additional_args: "-Dtinkar-example-data-properties.version=${{vars.TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION}}"
+          mvn_additional_args: -Dtinkar-example-data-properties.version=${{vars.TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION || '1.1.1'}}
          
