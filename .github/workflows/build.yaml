@@ -7,9 +7,9 @@ on:
     push:
     pull_request:
     workflow_dispatch:
-    repository_dispatch:
-      types:
-        - build-repository-dispatch-trigger
+
+env:
+  DATA_PROPERTIES_VERSION: tinkar-example-data-properties.version=${{inputs.properties_version}}
 
 
 jobs:

@@ -1,0 +1,45 @@
+name: Update Property Workflow
+
+run-name: 'Update Property Workflow -- ${{github.event.client_payload.artifactID}} ${{github.event.client_payload.version}}'
+
+# Pipeline/Workflow Triggers
+on:
+    repository_dispatch:
+        types:
+          - build-repository-dispatch-trigger
+
+jobs:
+    update-job:
+        name: Update Version Property
+        runs-on: ubuntu-24.04
+        if: github.event_name == 'repository_dispatch' && github.repository_owner == 'ikmdev'
+        steps:  
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+          with:
+            token: ${{secrets.IKMDEVOPS_PAT_TOKEN}}
+
+        - name: Update Env
+          run: |
+                git config user.name "ikmdevops"
+                git config user.email 'devops@ikm.dev'
+                git pull -p
+                echo "Adding $LATEST_TAG tag to the property version choice dropdown for users attempting to generate data"
+                yq -i ".on.workflow_dispatch.inputs.properties_version.options = [\"$LATEST_TAG\"] + .on.workflow_dispatch.inputs.properties_version.options" .github/workflows/generate_data.yaml
+                git diff -U1 | grep -E "\-\-\-|\- $LATEST_TAG" -B2 -A1 | grep -v "^--$" > add_property_version_choice.patch
+                git restore .
+                git apply add_property_version_choice.patch
+                git commit -am"Updated Generate Data Pipeline With $LATEST_TAG"
+                git push
+          env:
+              LATEST_TAG:  ${{env.BRANCH_NAME}}
+
+        - name: Push to Default branch
+          run: |
+            git config user.name "ikmdevops"
+            git config user.email "devops@ikm.dev"
+            git pull -p
+            git add .
+            git commit -m"Changed ${{github.event.client_payload.artifactID}} version to ${{github.event.client_payload.version}}"
+            git push
+          
