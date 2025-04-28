@@ -21,9 +21,10 @@ on:
         description: "Enter Properties Version"
         required: true
         options:
-          - tinkar-example-data-properties-v1.1.1
-          - tinkar-example-data-properties-v1.1.0
-          - tinkar-example-data-properties-v1.0.0
+          - 1.2.0
+          - 1.1.1
+          - 1.1.0
+          - 1.0.0
 env:
   DATA_PROPERTIES_VERSION: tinkar-example-data-properties.version=${{inputs.properties_version}}
 
