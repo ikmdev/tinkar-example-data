@@ -17,11 +17,14 @@ on:
           - 1.0.0
 
       properties_version:
-        type: string
-        description: |+
-          Enter Properties Version 
-          https://central.sonatype.com/artifact/dev.ikm.maven.tinkar/tinkar-example-data-properties/versions
+        type: choice
+        description: "Enter Properties Version"
         required: true
+        options:
+          - 1.2.0
+          - 1.1.1
+          - 1.1.0
+          - 1.0.0
 env:
   DATA_PROPERTIES_VERSION: tinkar-example-data-properties.version=${{inputs.properties_version}}
 
