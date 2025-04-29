@@ -1,6 +1,6 @@
-name: Update Property Workflow
+name: Update Environment Workflow
 
-run-name: 'Update Property Workflow -- ${{github.event.client_payload.artifactID}} ${{github.event.client_payload.version}}'
+run-name: 'Update Environment Workflow -- DATA_PROPERTIES_VERSION:${{github.event.client_payload.version}}'
 
 # Pipeline/Workflow Triggers
 on:
@@ -10,9 +10,12 @@ on:
 
 jobs:
     update-job:
-        name: Update Version Property
+        name: Update Environment Property
         runs-on: ubuntu-24.04
         if: github.event_name == 'repository_dispatch' && github.repository_owner == 'ikmdev'
+        strategy:
+            matrix:
+                file-name: [build, post_build, release]
         steps:  
         - name: Checkout Repository
           uses: actions/checkout@v4
@@ -24,22 +27,15 @@ jobs:
                 git config user.name "ikmdevops"
                 git config user.email 'devops@ikm.dev'
                 git pull -p
-                echo "Adding $LATEST_VERSION tag to the property version choice dropdown for users attempting to generate data"
-                yq -i ".on.workflow_dispatch.inputs.properties_version.options = [\"$LATEST_VERSION\"] + .on.workflow_dispatch.inputs.properties_version.options" .github/workflows/generate_data.yaml
-                git diff -U1 | grep -E "\-\-\-|\- $LATEST_TAG" -B2 -A1 | grep -v "^--$" > add_property_version_choice.patch
+
+                echo "Updating DATA_PROPERTIES_VERSION environment to $LATEST_VERSION tag in $FILE_NAME"
+                yq e -i '.env.DATA_PROPERTIES_VERSION = "$LATEST_VERSION"' .github/workflows/$FILE_NAME.yaml
+                git diff -U1 -w --ignore-blank-lines | grep -E "\-\-\-|[\+\-]\s+DATA_PROPERTIES_VERSION" -B2 -A1| grep -v "^--$"  > update_$FILE_NAME.patch
                 git restore .
-                git apply add_property_version_choice.patch
-                git commit -am"Updated Generate Data Pipeline With $LATEST_TAG"
+                git apply update_$FILE_NAME.patch
+                git commit -am"Updated DATA_PROPERTIES_VERSION environment to $LATEST_VERSION in $FILE_NAME"
                 git push
           env:
               LATEST_VERSION:  ${{github.event.client_payload.version}}
-
-        - name: Push to Default branch
-          run: |
-            git config user.name "ikmdevops"
-            git config user.email "devops@ikm.dev"
-            git pull -p
-            git add .
-            git commit -m"Changed ${{github.event.client_payload.artifactID}} version to ${{github.event.client_payload.version}}"
-            git push
+              FILE_NAME: ${{matrix.file-name}}
           

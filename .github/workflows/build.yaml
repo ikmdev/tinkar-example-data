@@ -9,7 +9,7 @@ on:
     workflow_dispatch:
 
 env:
-  DATA_PROPERTIES_VERSION: 1.1.1
+  DATA_PROPERTIES_VERSION: 1.2.0
 
 
 jobs:
