@@ -44,6 +44,7 @@ import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_PATH;
 import static dev.ikm.tinkar.terms.TinkarTerm.ENGLISH_LANGUAGE;
 import static dev.ikm.tinkar.terms.TinkarTerm.FLOAT_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.GREATER_THAN_OR_EQUAL_TO;
+import static dev.ikm.tinkar.terms.TinkarTerm.IMAGE_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.INACTIVE_STATE;
 import static dev.ikm.tinkar.terms.TinkarTerm.INTEGER_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.LESS_THAN;
@@ -240,7 +241,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         .fieldDefinition(
                                 IMAGE_FIELD_MEANING,
                                 IMAGE_FIELD_MEANING,
-                                BYTE_ARRAY_FIELD))
+                                IMAGE_FIELD))
                 .attach((FullyQualifiedName fqn) -> fqn
                         .text(EXAMPLE_PATTERN_THREE.description())
                         .language(ENGLISH_LANGUAGE)
