@@ -8,14 +8,14 @@ on:
         types:
           - update-repository-dispatch-trigger
 
+env:
+  LIST_OF_FILES: "build,post_build,release"
+
 jobs:
     update-job:
         name: Update Environment Property
         runs-on: ubuntu-24.04
         if: github.event_name == 'repository_dispatch' && github.repository_owner == 'ikmdev'
-        strategy:
-            matrix:
-                file-name: [build, post_build, release]
         steps:  
         - name: Checkout Repository
           uses: actions/checkout@v4
@@ -28,14 +28,19 @@ jobs:
                 git config user.email 'devops@ikm.dev'
                 git pull -p
 
-                echo "Updating DATA_PROPERTIES_VERSION environment to $LATEST_VERSION tag in $FILE_NAME"
-                yq e -i '.env.DATA_PROPERTIES_VERSION = "$LATEST_VERSION"' .github/workflows/$FILE_NAME.yaml
-                git diff -U1 -w --ignore-blank-lines | grep -E "\-\-\-|[\+\-]\s+DATA_PROPERTIES_VERSION" -B2 -A1| grep -v "^--$"  > update_$FILE_NAME.patch
-                git restore .
-                git apply update_$FILE_NAME.patch
-                git commit -am"Updated DATA_PROPERTIES_VERSION environment to $LATEST_VERSION in $FILE_NAME"
+                # Loop through each file name.
+                IFS=',' read -ra files <<< "$FILE_NAMES"
+
+                for file in "${files[@]}"; do
+                  echo "Updating DATA_PROPERTIES_VERSION environment to $LATEST_VERSION tag in $file"
+                  yq e -i '.env.DATA_PROPERTIES_VERSION = "${{github.event.client_payload.version}}"' .github/workflows/$file.yaml
+                  git diff -U1 -w --ignore-blank-lines | grep -E "\-\-\-|[\+\-]\s+DATA_PROPERTIES_VERSION" -B2 -A1| grep -v "^--$"  > update_$file.patch
+                  git restore .
+                  git apply update_$file.patch
+                done
+
+                git pull -p;
+                git commit -am"Updated DATA_PROPERTIES_VERSION environment to $LATEST_VERSION in $FILE_NAMES"
                 git push
           env:
-              LATEST_VERSION:  ${{github.event.client_payload.version}}
-              FILE_NAME: ${{matrix.file-name}}
-          
+              FILE_NAMES: ${{env.LIST_OF_FILES}}
