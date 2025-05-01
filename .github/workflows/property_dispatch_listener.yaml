@@ -1,6 +1,6 @@
-name: Update Environment Workflow
+name: Property Dispatch Listener Workflow
 
-run-name: 'Update Environment Workflow -- DATA_PROPERTIES_VERSION:${{github.event.client_payload.version}}'
+run-name: 'Property Dispatch Listener Workflow-- DATA_PROPERTIES_VERSION: ${{github.event.client_payload.version}}'
 
 # Pipeline/Workflow Triggers
 on:
