@@ -7,9 +7,9 @@ on:
     push:
     pull_request:
     workflow_dispatch:
-    repository_dispatch:
-      types:
-        - build-repository-dispatch-trigger
+
+env:
+  DATA_PROPERTIES_VERSION: 1.2.0
 
 
 jobs:
@@ -28,18 +28,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-        
-      # If triggered by resository_dispatch then 
-      # updates the TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION GitHub Variable
-      - name: Update tinkar-example-data-properties version
-        if: github.event_name == 'repository_dispatch'
-        run: gh variable set TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION --body "${{github.event.client_payload.version}}"
-        env:
-            GH_TOKEN: ${{secrets.IKMDEVOPS_PAT_TOKEN}}
-          
       - name: Build IKMDEV Code
         uses: ikmdev/maven-clean-install-build-action@v3.3.0
         with:
           branch_name: ${{github.ref_name}}
-          mvn_additional_args: -Dtinkar-example-data-properties.version=${{vars.TINKAR_EXAMPLE_DATA_PROPERTIES_VERSION || '1.1.1'}}
+          mvn_additional_args: -Dtinkar-example-data-properties.version=${{env.DATA_PROPERTIES_VERSION}}
          
