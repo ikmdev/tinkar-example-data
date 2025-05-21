@@ -72,7 +72,7 @@
 
     <modules>
         <module>tinkar-example-data-maven-plugin</module>
-        <module>tinkar-example-data-pipeline</module>
+        <!-- <module>tinkar-example-data-pipeline</module> -->
     </modules>
 
     <dependencyManagement>
