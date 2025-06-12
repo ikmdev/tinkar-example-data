@@ -2,7 +2,9 @@ package dev.ikm.maven.tinkar;
 
 import dev.ikm.maven.toolkit.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.id.IntIds;
+import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.common.id.PublicIds;
+import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.composer.Composer;
 import dev.ikm.tinkar.composer.Session;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
@@ -33,26 +35,39 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.ikm.tinkar.terms.TinkarTerm.ACTIVE_STATE;
+import static dev.ikm.tinkar.terms.TinkarTerm.AUTHOR_FOR_VERSION;
 import static dev.ikm.tinkar.terms.TinkarTerm.BOOLEAN_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.BYTE_ARRAY_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_LIST_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_SET_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.DEFINITION_DESCRIPTION_TYPE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_NOT_CASE_SENSITIVE;
+import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_PATTERN;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_MODULE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_PATH;
+import static dev.ikm.tinkar.terms.TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN;
 import static dev.ikm.tinkar.terms.TinkarTerm.ENGLISH_LANGUAGE;
 import static dev.ikm.tinkar.terms.TinkarTerm.FLOAT_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.FULLY_QUALIFIED_NAME_DESCRIPTION_TYPE;
 import static dev.ikm.tinkar.terms.TinkarTerm.GREATER_THAN_OR_EQUAL_TO;
 import static dev.ikm.tinkar.terms.TinkarTerm.IMAGE_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.INACTIVE_STATE;
 import static dev.ikm.tinkar.terms.TinkarTerm.INTEGER_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.LESS_THAN;
+import static dev.ikm.tinkar.terms.TinkarTerm.MASTER_PATH;
 import static dev.ikm.tinkar.terms.TinkarTerm.PREFERRED;
+import static dev.ikm.tinkar.terms.TinkarTerm.PRIMORDIAL_MODULE;
+import static dev.ikm.tinkar.terms.TinkarTerm.PRIMORDIAL_PATH;
 import static dev.ikm.tinkar.terms.TinkarTerm.PRIMORDIAL_STATE;
+import static dev.ikm.tinkar.terms.TinkarTerm.REGULAR_NAME_DESCRIPTION_TYPE;
 import static dev.ikm.tinkar.terms.TinkarTerm.ROLE_GROUP;
 import static dev.ikm.tinkar.terms.TinkarTerm.ROOT_VERTEX;
+import static dev.ikm.tinkar.terms.TinkarTerm.SANDBOX_MODULE;
+import static dev.ikm.tinkar.terms.TinkarTerm.SANDBOX_PATH;
 import static dev.ikm.tinkar.terms.TinkarTerm.SOLOR_CONCEPT_ASSEMBLAGE;
+import static dev.ikm.tinkar.terms.TinkarTerm.SPANISH_LANGUAGE;
+import static dev.ikm.tinkar.terms.TinkarTerm.STATED_NAVIGATION_PATTERN;
 import static dev.ikm.tinkar.terms.TinkarTerm.STRING;
 import static dev.ikm.tinkar.terms.TinkarTerm.TINKAR_MODEL_CONCEPT;
 import static dev.ikm.tinkar.terms.TinkarTerm.UNIVERSALLY_UNIQUE_IDENTIFIER;
@@ -89,6 +104,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
             createSampleHierarchy();
             createAxiomChangeTest();
             createExampleSemanticForRemainingPatterns();
+            createAdditionalSemanticsForViewCoordinateTests(composer);
             composer.commitSession(session);
         } finally {
             EntityService.get().endLoadPhase();
@@ -550,6 +566,199 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         .with(LESS_THAN)
                         .with(11.11)
                         .with("Example Units")));
+    }
+
+    private void createAdditionalSemanticsForViewCoordinateTests(Composer composer) {
+        Session primordialSession = composer.open(
+                State.ACTIVE,
+                currentTimeMillis,
+                USER,
+                PRIMORDIAL_MODULE,
+                PRIMORDIAL_PATH);
+
+        Session sandboxSession = composer.open(
+                State.ACTIVE,
+                currentTimeMillis + (1000 * 60 * 60 * 24 * 2), // Two days in the future
+                USER,
+                SANDBOX_MODULE,
+                SANDBOX_PATH);
+
+        Session developmentSession = composer.open(
+                State.ACTIVE,
+                currentTimeMillis,
+                USER,
+                DEVELOPMENT_MODULE,
+                DEVELOPMENT_PATH);
+
+        Session masterSession = composer.open(
+                State.ACTIVE,
+                currentTimeMillis,
+                USER,
+                DEVELOPMENT_MODULE,
+                MASTER_PATH);
+
+        Session spanishSession = composer.open(
+                State.ACTIVE,
+                currentTimeMillis - (1000 * 60 * 60 * 24 * 2), // Two days in the past
+                USER,
+                DEVELOPMENT_MODULE,
+                DEVELOPMENT_PATH);
+
+        Session authorSession = composer.open(
+                State.INACTIVE,
+                currentTimeMillis - (1000 * 60 * 60 * 24 * 1), // One day in the past,
+                AUTHOR_FOR_VERSION,
+                DEVELOPMENT_MODULE,
+                DEVELOPMENT_PATH);
+
+        String conceptDescription = "Concept for ViewCoordinate tests";
+        String conceptDescriptionSpanish = "Concepto para pruebas ViewCoordinate";
+        EntityProxy.Concept conceptForViewCoordTests = EntityProxy.Concept.make(conceptDescription, PublicIds.of(UUID.nameUUIDFromBytes(conceptDescription.getBytes())));
+        EntityProxy.Semantic usFqnId = EntityProxy.Semantic.make(PublicIds.singleSemanticId(FULLY_QUALIFIED_NAME_DESCRIPTION_TYPE, conceptForViewCoordTests));
+        EntityProxy.Semantic usSynonymId = EntityProxy.Semantic.make(PublicIds.singleSemanticId(REGULAR_NAME_DESCRIPTION_TYPE, conceptForViewCoordTests));
+        EntityProxy.Semantic definitionId = EntityProxy.Semantic.make(PublicIds.singleSemanticId(DEFINITION_DESCRIPTION_TYPE, conceptForViewCoordTests));
+        EntityProxy.Semantic statedAxiomId = EntityProxy.Semantic.make(PublicIds.singleSemanticId(EL_PLUS_PLUS_STATED_AXIOMS_PATTERN, conceptForViewCoordTests));
+        EntityProxy.Semantic statedNavId = EntityProxy.Semantic.make(PublicIds.singleSemanticId(STATED_NAVIGATION_PATTERN, conceptForViewCoordTests));
+
+        developmentSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptForViewCoordTests))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .semantic(usFqnId)
+                        .text(conceptDescription + " - US FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(usDialect()))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(conceptDescription + " - GB FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .attach(new GBDialect().acceptability(PREFERRED)))
+                .attach((Synonym synonym) -> synonym
+                        .semantic(usSynonymId)
+                        .text(conceptDescription + " - US Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(usDialect()))
+                .attach((Synonym synonym) -> synonym
+                        .text(conceptDescription + " - GB Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE)
+                        .attach(new GBDialect().acceptability(PREFERRED)))
+                .attach((Definition definition) -> definition
+                        .semantic(definitionId)
+                        .text("This is the Concept used to test ViewCoordinate functionality.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((Identifier identifier) -> identifier
+                        .source(UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(conceptForViewCoordTests.asUuidArray()[0].toString()))
+                .attach((StatedNavigation statedNavigation) -> statedNavigation
+                        .semantic(statedNavId)
+                        .parents(SAMPLE_TINKAR_DATA))
+                .attach((StatedAxiom statedAxiom) -> statedAxiom
+                        .semantic(statedAxiomId)
+                        .isA(SAMPLE_TINKAR_DATA));
+
+        primordialSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptForViewCoordTests))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .semantic(usFqnId)
+                        .text(conceptDescription + " - Primordial US FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .semantic(usSynonymId)
+                        .text(conceptDescription + " - Primordial US Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((StatedNavigation statedNavigation) -> statedNavigation
+                        .semantic(statedNavId)
+                        .parents(ROOT_VERTEX))
+                .attach((StatedAxiom statedAxiom) -> statedAxiom
+                        .semantic(statedAxiomId)
+                        .isA(ROOT_VERTEX));
+
+        sandboxSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptForViewCoordTests))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .semantic(usFqnId)
+                        .text(conceptDescription + " - Sandbox US FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .semantic(usSynonymId)
+                        .text(conceptDescription + " - Sandbox US Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE))
+                .attach((StatedNavigation statedNavigation) -> statedNavigation
+                        .semantic(statedNavId)
+                        .parents(ROOT_VERTEX))
+                .attach((StatedAxiom statedAxiom) -> statedAxiom
+                        .semantic(statedAxiomId)
+                        .isA(ROOT_VERTEX));
+
+        masterSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptForViewCoordTests))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .semantic(usFqnId)
+                        .text(conceptDescription + " - Master US FQN")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .semantic(usSynonymId)
+                        .text(conceptDescription + " - Master US Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(ENGLISH_LANGUAGE));
+
+        authorSession.compose(new FullyQualifiedName()
+                .semantic(usFqnId)
+                .text(conceptDescription + " - US FQN with new Author")
+                .language(ENGLISH_LANGUAGE)
+                .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE), conceptForViewCoordTests);
+
+        authorSession.compose(new Synonym()
+                .semantic(usSynonymId)
+                .text(conceptDescription + " - US Synonym with new Author")
+                .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                .language(ENGLISH_LANGUAGE), conceptForViewCoordTests);
+
+        spanishSession.compose((ConceptAssembler conceptAssembler) -> conceptAssembler.concept(conceptForViewCoordTests))
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(conceptDescriptionSpanish + " - ES FQN")
+                        .language(SPANISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .text(conceptDescriptionSpanish + " - ES Synonym")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(SPANISH_LANGUAGE))
+                .attach((Definition definition) -> definition
+                        .semantic(definitionId)
+                        .text("Este es el concepto utilizado para probar la funcionalidad de ViewCoordinate.")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                        .language(SPANISH_LANGUAGE));
+
+        spanishSession.compose(new FullyQualifiedName()
+                .text("Idioma Inglés")
+                .language(SPANISH_LANGUAGE)
+                .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE), ENGLISH_LANGUAGE);
+
+        spanishSession.compose(new Synonym()
+                .text("Inglés")
+                .language(SPANISH_LANGUAGE)
+                .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE), ENGLISH_LANGUAGE);
+
+        spanishSession.compose(new FullyQualifiedName()
+                .text("Idioma Español")
+                .language(SPANISH_LANGUAGE)
+                .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE), SPANISH_LANGUAGE);
+
+        spanishSession.compose(new Synonym()
+                .text("Español")
+                .language(SPANISH_LANGUAGE)
+                .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE), SPANISH_LANGUAGE);
+
+        composer.commitSession(primordialSession);
+        composer.commitSession(sandboxSession);
+        composer.commitSession(developmentSession);
+        composer.commitSession(masterSession);
+        composer.commitSession(spanishSession);
+        composer.commitSession(authorSession);
     }
 
     private Concept createConcept(String description, String uuidStr) {
