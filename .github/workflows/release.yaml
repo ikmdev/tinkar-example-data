@@ -60,7 +60,7 @@ jobs:
             -f tinkar-example-data-maven-plugin
 
       - name: Shared Release Action
-        uses: ikmdev/maven-semver-release-action@v2.3.0
+        uses: ikmdev/maven-semver-release-action@v2.6.0
         with:
           version_type: ${{ github.event.inputs.version_type }}
           github_token: ${{secrets.GITHUB_TOKEN}}
