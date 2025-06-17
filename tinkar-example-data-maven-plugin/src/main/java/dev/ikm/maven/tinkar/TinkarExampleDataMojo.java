@@ -1,10 +1,8 @@
 package dev.ikm.maven.tinkar;
 
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.id.IntIds;
-import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.common.id.PublicIds;
-import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.composer.Composer;
 import dev.ikm.tinkar.composer.Session;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
@@ -37,13 +35,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import static dev.ikm.tinkar.terms.TinkarTerm.ACTIVE_STATE;
 import static dev.ikm.tinkar.terms.TinkarTerm.AUTHOR_FOR_VERSION;
 import static dev.ikm.tinkar.terms.TinkarTerm.BOOLEAN_FIELD;
-import static dev.ikm.tinkar.terms.TinkarTerm.BYTE_ARRAY_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_LIST_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_SET_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEFINITION_DESCRIPTION_TYPE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_NOT_CASE_SENSITIVE;
-import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_PATTERN;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_MODULE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_PATH;
 import static dev.ikm.tinkar.terms.TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN;
