@@ -47,7 +47,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '23'
-          server-id: ossrh
+          server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_CENTRAL_TOKEN
           gpg-private-key: ${{secrets.GPG_KEY}}
@@ -108,9 +108,9 @@ jobs:
                 -DskipITs \
                 -Dmaven.main.skip \
                 -Dmaven.test.skip \
-                -DrepositoryId=ossrh \
-                -DrepositoryIdOSSRH='true' \
-                -PstageOSSRH \
+                -DrepositoryId=central \
+                -DrepositoryIdCentralRepository='true' \
+                -PstageMavenCentralRepository \
                 -PdeployReleaseDataArtifacts \
                 -Dmaven.deploy.skip=true \
                 -DskipNexusStagingDeployMojo=true \
@@ -118,6 +118,6 @@ jobs:
                 -D${{env.DATA_PROPERTIES_VERSION}}  
                      
         env:
-              MAVEN_USERNAME: ${{secrets.OSSRH_TOKEN_USER}}
-              MAVEN_CENTRAL_TOKEN: ${{secrets.OSSRH_TOKEN_PASS}}
+              MAVEN_USERNAME: ${{secrets.MC_SECRET_USERNAME}}
+              MAVEN_CENTRAL_TOKEN: ${{secrets.MC_SECRET_PASSWORD}}
               MAVEN_GPG_PASSPHRASE: ${{secrets.GPG_PASSPHRASE}}
