@@ -374,7 +374,7 @@
 			<activation>
 				<property>
 					<name>repositoryId</name>
-					<value>!ossrh</value>
+					<value>!central</value>
 				</property>
 			</activation>
 			<build>
@@ -410,30 +410,53 @@
 		</profile>
 		<profile>
 			<id>deployReleaseDataArtifacts</id>
+			<activation>
+				<property>
+					<name>repositoryId</name>
+					<value>central</value>
+				</property>
+			</activation>
 			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>dev.ikm.build</groupId>
+							<artifactId>central-custom-publishing-maven-plugin</artifactId>
+							<version>${central-custom-publishing-maven-plugin.version}</version>
+						</plugin>
+					</plugins>
+				</pluginManagement>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
+						<groupId>dev.ikm.build</groupId>
+						<artifactId>central-custom-publishing-maven-plugin</artifactId>
 						<executions>
+							<execution>
+								<id>create bundle</id>
+								<phase>install</phase>
+								<goals>
+									<goal>create-bundle</goal>
+								</goals>
+								<configuration>
+									<pomFile>${project.build.directory}/data-artifact-pom.xml</pomFile>
+									<artifactFiles>
+										<artifactFile>${data-artifact.path-prefix}-unreasoned-sa.zip</artifactFile>
+										<artifactFile>${data-artifact.path-prefix}-reasoned-sa.zip</artifactFile>
+										<artifactFile>${data-artifact.path-prefix}-unreasoned-pb.zip</artifactFile>
+										<artifactFile>${data-artifact.path-prefix}-reasoned-pb.zip</artifactFile>
+									</artifactFiles>
+									<passPhrase>${gpg.passPhrase}</passPhrase>
+								</configuration>
+							</execution>
 							<execution>
 								<id>sign-and-deploy-release-artifacts</id>
 								<phase>deploy</phase>
 								<goals>
-									<goal>sign-and-deploy-file</goal>
+									<goal>publish</goal>
 								</goals>
 								<configuration>
-									<repositoryId>${repositoryId}</repositoryId>
-									<url>${project.distributionManagement.repository.url}</url>
-									<groupId>${data-artifact.groupId}</groupId>
-									<artifactId>${data-artifact.artifactId}</artifactId>
-									<version>${data-artifact.version}</version>
-									<pomFile>${project.build.directory}/data-artifact-pom.xml</pomFile>
-									<file>${tinkar-example-data-properties.path}</file>
-									<packaging>properties</packaging>
-									<files>${deploymentFiles}</files>
-									<classifiers>${deploymentClassifiers}</classifiers>
-									<types>${deploymentTypes}</types>
+									<publishingServerId>${repositoryId}</publishingServerId>
+									<waitUntil>uploaded</waitUntil>
 								</configuration>
 							</execution>
 						</executions>
