@@ -68,6 +68,8 @@
         <slf4j.version>2.0.13</slf4j.version>
          <!-- Templating Plugin Version-->
         <templating-maven-plugin.version>3.0.0</templating-maven-plugin.version>
+        <!-- Bundling & Publishing Version -->
+        <central-custom-publishing-maven-plugin.version>0.0.3</central-custom-publishing-maven-plugin.version>
     </properties>
 
     <modules>

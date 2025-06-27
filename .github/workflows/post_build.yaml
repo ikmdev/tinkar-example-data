@@ -41,4 +41,4 @@ jobs:
             sonarcloud_token: ${{ secrets.SONAR_TOKEN }}
             sonarcloud_tests: ${{ '' }}
             java_version: '23'
-            mvn_additional_args: '-Dtinkar-example-data-properties.version=${{env.DATA_PROPERTIES_VERSION}}'
+            mvn_additional_args: '-Dtinkar-example-data-properties.version=${{env.DATA_PROPERTIES_VERSION}} -Dgpg.passPhrase=${{secrets.GPG_PASSPHRASE}}'
