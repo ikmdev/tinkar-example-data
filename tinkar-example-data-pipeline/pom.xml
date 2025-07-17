@@ -415,6 +415,9 @@
 					<name>repositoryId</name>
 					<value>central</value>
 				</property>
+				<file>
+					<exists>target/data-artifact-pom.xml</exists>
+				</file>
 			</activation>
 			<build>
 				<pluginManagement>
