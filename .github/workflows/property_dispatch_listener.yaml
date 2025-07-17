@@ -37,6 +37,11 @@ jobs:
                   git diff -U1 -w --ignore-blank-lines | grep -E "\-\-\-|[\+\-]\s+DATA_PROPERTIES_VERSION" -B2 -A1| grep -v "^--$"  > update_$file.patch
                   git restore .
                 done
+
+                echo "Adding DATA_PROPERTIES_VERSION tag $LATEST_VERSION to choice dropdown for users attempting to generate data"
+                yq -i ".on.workflow_dispatch.inputs.properties_version.options = [\"$LATEST_VERSION\"] + .on.workflow_dispatch.inputs.properties_version.options" .github/workflows/generate_data.yaml
+                git diff -U1 | grep -E "\-\-\-|\- $LATEST_VERSION" -B2 -A1 | grep -v "^--$" > update_generate_data.patch
+                git restore .
                 
                 git apply *.patch
                 git pull -p;
