@@ -115,7 +115,7 @@ jobs:
                 -DrepositoryIdCentralRepository='true' \
                 -PstageMavenCentralRepository \
                 -PdeployReleaseDataArtifacts \
-                -Dgpg.passPhrase=${{secrets.GPG_PASSPHRASE}}
+                -Dgpg.passPhrase=${{secrets.GPG_PASSPHRASE}} \
                 -Dmaven.deploy.skip=true \
                 -DskipNexusStagingDeployMojo=true \
                 -Dmaven.build.cache.enabled=false \
