@@ -353,7 +353,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         PublicIds.of("1f200ca6-960e-11e5-8994-feff819cdc9f"),
                         1.0d,
                         new byte[1024],
-                        PublicIds.list.empty() // TODO UUID not implemented in EntityRecordFactory
+                        UUID.randomUUID() // TODO UUID not implemented in EntityRecordFactory
                 ))));
 
         session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
@@ -363,7 +363,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         PublicIds.of("700546a3-09c7-3fc2-9eb9-53d318659a09"),
                         2.0d,
                         new byte[1024],
-                        PublicIds.list.empty() // TODO UUID not implemented in EntityRecordFactory
+                        UUID.randomUUID() // TODO UUID not implemented in EntityRecordFactory
                 ))));
     }
 
