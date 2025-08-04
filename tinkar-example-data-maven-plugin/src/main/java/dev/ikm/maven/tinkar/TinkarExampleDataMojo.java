@@ -320,7 +320,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         .fieldDefinition(
                                 PUBLIC_ID_FIELD_MEANING,
                                 PUBLIC_ID_FIELD_MEANING,
-                                UUID_LIST_FOR_COMPONENT) // TODO
+                                UUID_LIST_FOR_COMPONENT) // TODO confirm field type for PublicIDs
                         .fieldDefinition(
                                 DECIMAL_FIELD_MEANING,
                                 DECIMAL_FIELD_MEANING,
@@ -354,7 +354,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         PublicIds.of("1f200ca6-960e-11e5-8994-feff819cdc9f"),
                         1.0d,
                         new byte[1024],
-                        UUID.randomUUID()
+                        PublicIds.list.empty() // TODO UUID not implemented in EntityRecordFactory
                 ))));
 
         session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
@@ -364,7 +364,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                         PublicIds.of("700546a3-09c7-3fc2-9eb9-53d318659a09"),
                         2.0d,
                         new byte[1024],
-                        UUID.randomUUID()
+                        PublicIds.list.empty() // TODO UUID not implemented in EntityRecordFactory
                 ))));
     }
 
