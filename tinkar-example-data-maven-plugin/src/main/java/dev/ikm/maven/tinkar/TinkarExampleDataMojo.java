@@ -19,7 +19,6 @@ import dev.ikm.tinkar.composer.template.StatedNavigation;
 import dev.ikm.tinkar.composer.template.Synonym;
 import dev.ikm.tinkar.composer.template.USDialect;
 import dev.ikm.tinkar.entity.EntityService;
-import dev.ikm.tinkar.entity.graph.DiTreeEntity;
 import dev.ikm.tinkar.schema.DiGraph;
 import dev.ikm.tinkar.terms.EntityProxy;
 import dev.ikm.tinkar.terms.EntityProxy.Concept;
@@ -444,17 +443,10 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                 .pattern(EXAMPLE_PATTERN)
                 .reference(createConcept("First Semantic for Sample Pattern 6", "22e66d5b-f8b8-53d1-8372-416b91b29816"))
                 .fieldValues(objects -> objects.addAll(Lists.mutable.of(
-                        DiTreeEntity.builder().build(),
+                        DataHelper.createSampleDiTreeEntity(),
                         DiGraph.newBuilder().build()
                 ))));
 
-        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
-                .pattern(EXAMPLE_PATTERN)
-                .reference(createConcept("Second Semantic for Sample Pattern 6", "89907a77-7d7a-58fe-8078-6d97ce236611"))
-                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
-                        DiTreeEntity.builder().build(),
-                        DiGraph.newBuilder().build()
-                ))));
     }
 
     private void createSampleHierarchy() {
