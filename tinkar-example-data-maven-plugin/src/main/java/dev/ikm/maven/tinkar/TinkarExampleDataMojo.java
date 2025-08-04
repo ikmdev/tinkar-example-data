@@ -19,7 +19,6 @@ import dev.ikm.tinkar.composer.template.StatedNavigation;
 import dev.ikm.tinkar.composer.template.Synonym;
 import dev.ikm.tinkar.composer.template.USDialect;
 import dev.ikm.tinkar.entity.EntityService;
-import dev.ikm.tinkar.schema.DiGraph;
 import dev.ikm.tinkar.terms.EntityProxy;
 import dev.ikm.tinkar.terms.EntityProxy.Concept;
 import dev.ikm.tinkar.terms.State;
@@ -47,7 +46,6 @@ import static dev.ikm.tinkar.terms.TinkarTerm.DEFINITION_DESCRIPTION_TYPE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_NOT_CASE_SENSITIVE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_MODULE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_PATH;
-import static dev.ikm.tinkar.terms.TinkarTerm.DIGRAPH_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.DITREE_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN;
 import static dev.ikm.tinkar.terms.TinkarTerm.ENGLISH_LANGUAGE;
@@ -76,7 +74,6 @@ import static dev.ikm.tinkar.terms.TinkarTerm.STRING;
 import static dev.ikm.tinkar.terms.TinkarTerm.TINKAR_MODEL_CONCEPT;
 import static dev.ikm.tinkar.terms.TinkarTerm.UNIVERSALLY_UNIQUE_IDENTIFIER;
 import static dev.ikm.tinkar.terms.TinkarTerm.USER;
-import static dev.ikm.tinkar.terms.TinkarTerm.UUID_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.UUID_LIST_FOR_COMPONENT;
 import static dev.ikm.tinkar.terms.TinkarTerm.VALUE_CONSTRAINT_PATTERN;
 
@@ -328,10 +325,10 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                                 BYTE_ARRAY_FIELD_MEANING,
                                 BYTE_ARRAY_FIELD_MEANING,
                                 BYTE_ARRAY_FIELD)
-                        .fieldDefinition(
-                                UUID_FIELD_MEANING,
-                                UUID_FIELD_MEANING,
-                                UUID_FIELD)
+//                        .fieldDefinition(   // TODO UUID serialization not implemented in EntityRecordFactory
+//                                UUID_FIELD_MEANING,
+//                                UUID_FIELD_MEANING,
+//                                UUID_FIELD)
                 )
                 .attach((FullyQualifiedName fqn) -> fqn
                         .text(EXAMPLE_PATTERN.description())
@@ -352,8 +349,8 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                 .fieldValues(objects -> objects.addAll(Lists.mutable.of(
                         PublicIds.of("1f200ca6-960e-11e5-8994-feff819cdc9f"),
                         1.0d,
-                        new byte[1024],
-                        UUID.randomUUID() // TODO UUID not implemented in EntityRecordFactory
+                        new byte[1024]
+                        //UUID.randomUUID() // TODO UUID serialization not implemented in EntityRecordFactory
                 ))));
 
         session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
@@ -362,8 +359,8 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                 .fieldValues(objects -> objects.addAll(Lists.mutable.of(
                         PublicIds.of("700546a3-09c7-3fc2-9eb9-53d318659a09"),
                         2.0d,
-                        new byte[1024],
-                        UUID.randomUUID() // TODO UUID not implemented in EntityRecordFactory
+                        new byte[1024]
+                        //UUID.randomUUID() // TODO UUID serialization not implemented in EntityRecordFactory
                 ))));
     }
 
@@ -421,10 +418,10 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                                 DITREE_FIELD_MEANING,
                                 DITREE_FIELD_MEANING,
                                 DITREE_FIELD)
-                        .fieldDefinition(
-                                DIGRAPH_FIELD_MEANING,
-                                DIGRAPH_FIELD_MEANING,
-                                DIGRAPH_FIELD)
+//                        .fieldDefinition( // TODO DiGraph serialization not implemented in EntityRecordFactory
+//                                DIGRAPH_FIELD_MEANING,
+//                                DIGRAPH_FIELD_MEANING,
+//                                DIGRAPH_FIELD)
                 )
                 .attach((FullyQualifiedName fqn) -> fqn
                         .text(EXAMPLE_PATTERN.description())
@@ -443,8 +440,8 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                 .pattern(EXAMPLE_PATTERN)
                 .reference(createConcept("First Semantic for Sample Pattern 6", "22e66d5b-f8b8-53d1-8372-416b91b29816"))
                 .fieldValues(objects -> objects.addAll(Lists.mutable.of(
-                        DataHelper.createSampleDiTreeEntity(),
-                        DiGraph.newBuilder().build()
+                        DataHelper.createSampleDiTreeEntity()
+                        //DiGraph.newBuilder().build()  // TODO DiGraph serialization not implemented in EntityRecordFactory
                 ))));
 
     }
