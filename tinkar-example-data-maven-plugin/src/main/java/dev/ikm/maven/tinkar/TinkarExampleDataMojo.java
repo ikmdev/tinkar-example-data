@@ -19,6 +19,8 @@ import dev.ikm.tinkar.composer.template.StatedNavigation;
 import dev.ikm.tinkar.composer.template.Synonym;
 import dev.ikm.tinkar.composer.template.USDialect;
 import dev.ikm.tinkar.entity.EntityService;
+import dev.ikm.tinkar.entity.graph.DiTreeEntity;
+import dev.ikm.tinkar.schema.DiGraph;
 import dev.ikm.tinkar.terms.EntityProxy;
 import dev.ikm.tinkar.terms.EntityProxy.Concept;
 import dev.ikm.tinkar.terms.State;
@@ -28,20 +30,26 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.eclipse.collections.api.factory.Lists;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.ikm.tinkar.terms.TinkarTerm.ACTIVE_STATE;
 import static dev.ikm.tinkar.terms.TinkarTerm.AUTHOR_FOR_VERSION;
 import static dev.ikm.tinkar.terms.TinkarTerm.BOOLEAN_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.BYTE_ARRAY_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_LIST_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.COMPONENT_ID_SET_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.DECIMAL_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEFINITION_DESCRIPTION_TYPE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DESCRIPTION_NOT_CASE_SENSITIVE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_MODULE;
 import static dev.ikm.tinkar.terms.TinkarTerm.DEVELOPMENT_PATH;
+import static dev.ikm.tinkar.terms.TinkarTerm.DIGRAPH_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.DITREE_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN;
 import static dev.ikm.tinkar.terms.TinkarTerm.ENGLISH_LANGUAGE;
 import static dev.ikm.tinkar.terms.TinkarTerm.FLOAT_FIELD;
@@ -49,6 +57,7 @@ import static dev.ikm.tinkar.terms.TinkarTerm.FULLY_QUALIFIED_NAME_DESCRIPTION_T
 import static dev.ikm.tinkar.terms.TinkarTerm.GREATER_THAN_OR_EQUAL_TO;
 import static dev.ikm.tinkar.terms.TinkarTerm.IMAGE_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.INACTIVE_STATE;
+import static dev.ikm.tinkar.terms.TinkarTerm.INSTANT_LITERAL;
 import static dev.ikm.tinkar.terms.TinkarTerm.INTEGER_FIELD;
 import static dev.ikm.tinkar.terms.TinkarTerm.LESS_THAN;
 import static dev.ikm.tinkar.terms.TinkarTerm.MASTER_PATH;
@@ -68,6 +77,8 @@ import static dev.ikm.tinkar.terms.TinkarTerm.STRING;
 import static dev.ikm.tinkar.terms.TinkarTerm.TINKAR_MODEL_CONCEPT;
 import static dev.ikm.tinkar.terms.TinkarTerm.UNIVERSALLY_UNIQUE_IDENTIFIER;
 import static dev.ikm.tinkar.terms.TinkarTerm.USER;
+import static dev.ikm.tinkar.terms.TinkarTerm.UUID_FIELD;
+import static dev.ikm.tinkar.terms.TinkarTerm.UUID_LIST_FOR_COMPONENT;
 import static dev.ikm.tinkar.terms.TinkarTerm.VALUE_CONSTRAINT_PATTERN;
 
 @Mojo(name = "generate-example-data", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.COMPILE)
@@ -97,6 +108,9 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
             createPatternOne();
             createPatternTwo();
             createPatternThree();
+            createPatternFour();
+            createPatternFive();
+            createPatternSix();
             createSampleHierarchy();
             createAxiomChangeTest();
             createExampleSemanticForRemainingPatterns();
@@ -290,6 +304,157 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
                 .reference(CONCEPT_FOR_SEMANTIC_1)
                 .fieldValues(objects -> objects.addAll(
                         Lists.mutable.of(bytes.get()))));
+    }
+
+    private void createPatternFour() {
+        EntityProxy.Pattern EXAMPLE_PATTERN = EntityProxy.Pattern.make("Tinkar Semantic Test Pattern 4", UUID.fromString("0f3f95a1-c9d3-5656-bc47-6b52a43db0d3"));
+        Concept EXAMPLE_MEANING = createConcept("A test pattern for identifier data types", "0d3834d4-5769-579a-b01c-b0ef9c167b8b");
+        Concept PUBLIC_ID_FIELD_MEANING = createConcept("An example PublicID field", "9d41cd1f-5fbd-522f-9a51-033720a4d2c4");
+        Concept DECIMAL_FIELD_MEANING = createConcept("An example Decimal field", "e54ea59b-4525-5664-95e3-bbe9dcb46263");
+        Concept BYTE_ARRAY_FIELD_MEANING = createConcept("An example Byte Array field", "e1fa11db-9a44-5e21-8466-18099cdbb021");
+        Concept UUID_FIELD_MEANING = createConcept("An example UUID field", "de01877c-57d0-50bc-9837-af0e89285522");
+
+        session.compose((PatternAssembler patternAssembler) -> patternAssembler.pattern(EXAMPLE_PATTERN)
+                        .meaning(EXAMPLE_MEANING)
+                        .purpose(EXAMPLE_MEANING)
+                        .fieldDefinition(
+                                PUBLIC_ID_FIELD_MEANING,
+                                PUBLIC_ID_FIELD_MEANING,
+                                UUID_LIST_FOR_COMPONENT) // TODO
+                        .fieldDefinition(
+                                DECIMAL_FIELD_MEANING,
+                                DECIMAL_FIELD_MEANING,
+                                DECIMAL_FIELD)
+                        .fieldDefinition(
+                                BYTE_ARRAY_FIELD_MEANING,
+                                BYTE_ARRAY_FIELD_MEANING,
+                                BYTE_ARRAY_FIELD)
+                        .fieldDefinition(
+                                UUID_FIELD_MEANING,
+                                UUID_FIELD_MEANING,
+                                UUID_FIELD)
+                )
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(EXAMPLE_PATTERN.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .text(EXAMPLE_PATTERN.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Definition definition) -> definition
+                        .text("An example pattern for Tinkar PublicID, Decimal, Byte Array, and UUID data types")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE));
+
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(EXAMPLE_PATTERN)
+                .reference(createConcept("First Semantic for Sample Pattern 4", "09b54a06-c920-5260-8790-5f2c5dc97c88"))
+                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
+                        PublicIds.of("1f200ca6-960e-11e5-8994-feff819cdc9f"),
+                        1.0d,
+                        new byte[1024],
+                        UUID.randomUUID()
+                ))));
+
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(EXAMPLE_PATTERN)
+                .reference(createConcept("Second Semantic for Sample Pattern 4", "868fbafa-5de2-531c-9b76-2d3d712a5753"))
+                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
+                        PublicIds.of("700546a3-09c7-3fc2-9eb9-53d318659a09"),
+                        2.0d,
+                        new byte[1024],
+                        UUID.randomUUID()
+                ))));
+    }
+
+    private void createPatternFive() {
+        EntityProxy.Pattern EXAMPLE_PATTERN = EntityProxy.Pattern.make("Tinkar Semantic Test Pattern 5", UUID.fromString("ff15ab9d-87a6-5d87-bc6c-55d3eea1b130"));
+        Concept EXAMPLE_MEANING = createConcept("A test pattern for Instant data types", "7cc0adc6-623f-50d2-a185-31c443e1a98d");
+        Concept INSTANT_FIELD_MEANING = createConcept("An example Instant field", "d6c50ee4-3821-507b-9bb1-c480fc70f78e");
+
+        session.compose((PatternAssembler patternAssembler) -> patternAssembler.pattern(EXAMPLE_PATTERN)
+                        .meaning(EXAMPLE_MEANING)
+                        .purpose(EXAMPLE_MEANING)
+                        .fieldDefinition(
+                                INSTANT_FIELD_MEANING,
+                                INSTANT_FIELD_MEANING,
+                                INSTANT_LITERAL)
+                )
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(EXAMPLE_PATTERN.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .text(EXAMPLE_PATTERN.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Definition definition) -> definition
+                        .text("An example pattern for Tinkar Instant data types")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE));
+
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(EXAMPLE_PATTERN)
+                .reference(createConcept("First Semantic for Sample Pattern 5", "d6770779-394f-5669-9455-45d5909d891a"))
+                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
+                        Instant.now()
+                ))));
+
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(EXAMPLE_PATTERN)
+                .reference(createConcept("Second Semantic for Sample Pattern 5", "9d8f069e-9a4c-52d3-899c-ffc0040b0b6a"))
+                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
+                        Instant.now().minusSeconds(3600)
+                ))));
+    }
+
+    private void createPatternSix() {
+        EntityProxy.Pattern EXAMPLE_PATTERN = EntityProxy.Pattern.make("Tinkar Semantic Test Pattern 6", UUID.fromString("3960e9ee-e69f-54d9-9848-c0e767055fd6"));
+        Concept EXAMPLE_MEANING = createConcept("A test pattern for Graph data types", "b9ff7c11-dacc-5a50-bb41-28eb371ec488");
+        Concept DITREE_FIELD_MEANING = createConcept("An example DiTree field", "c6aac61d-5fba-57ac-9333-bd8aa6d481ac");
+        Concept DIGRAPH_FIELD_MEANING = createConcept("An example DiGraph field", "662f4238-6a09-53b1-81bc-f0a5b543f363");
+
+        session.compose((PatternAssembler patternAssembler) -> patternAssembler.pattern(EXAMPLE_PATTERN)
+                        .meaning(EXAMPLE_MEANING)
+                        .purpose(EXAMPLE_MEANING)
+                        .fieldDefinition(
+                                DITREE_FIELD_MEANING,
+                                DITREE_FIELD_MEANING,
+                                DITREE_FIELD)
+                        .fieldDefinition(
+                                DIGRAPH_FIELD_MEANING,
+                                DIGRAPH_FIELD_MEANING,
+                                DIGRAPH_FIELD)
+                )
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .text(EXAMPLE_PATTERN.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Synonym synonym) -> synonym
+                        .text(EXAMPLE_PATTERN.description())
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE))
+                .attach((Definition definition) -> definition
+                        .text("An example pattern for Tinkar Graph data types")
+                        .language(ENGLISH_LANGUAGE)
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE));
+
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(EXAMPLE_PATTERN)
+                .reference(createConcept("First Semantic for Sample Pattern 6", "22e66d5b-f8b8-53d1-8372-416b91b29816"))
+                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
+                        DiTreeEntity.builder().build(),
+                        DiGraph.newBuilder().build()
+                ))));
+
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .pattern(EXAMPLE_PATTERN)
+                .reference(createConcept("Second Semantic for Sample Pattern 6", "89907a77-7d7a-58fe-8078-6d97ce236611"))
+                .fieldValues(objects -> objects.addAll(Lists.mutable.of(
+                        DiTreeEntity.builder().build(),
+                        DiGraph.newBuilder().build()
+                ))));
     }
 
     private void createSampleHierarchy() {
@@ -574,7 +739,7 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
 
         Session sandboxSession = composer.open(
                 State.ACTIVE,
-                currentTimeMillis + (1000 * 60 * 60 * 24 * 2), // Two days in the future
+                currentTimeMillis + TimeUnit.DAYS.toMillis(2), // Two days in the future
                 USER,
                 SANDBOX_MODULE,
                 SANDBOX_PATH);
@@ -595,14 +760,14 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
 
         Session spanishSession = composer.open(
                 State.ACTIVE,
-                currentTimeMillis - (1000 * 60 * 60 * 24 * 2), // Two days in the past
+                currentTimeMillis - TimeUnit.DAYS.toMillis(2), // Two days in the past
                 USER,
                 DEVELOPMENT_MODULE,
                 DEVELOPMENT_PATH);
 
         Session authorSession = composer.open(
                 State.INACTIVE,
-                currentTimeMillis - (1000 * 60 * 60 * 24 * 1), // One day in the past,
+                currentTimeMillis - TimeUnit.DAYS.toMillis(1), // One day in the past,
                 AUTHOR_FOR_VERSION,
                 DEVELOPMENT_MODULE,
                 DEVELOPMENT_PATH);
@@ -792,4 +957,10 @@ public class TinkarExampleDataMojo extends SimpleTinkarMojo {
     private USDialect usDialect() {
         return new USDialect().acceptability(PREFERRED);
     }
+
+    @Override
+    public void handleIsolatedFields() {
+        // No op
+    }
+
 }
