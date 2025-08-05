@@ -48,9 +48,9 @@
 
     <properties>
         <!-- Tinkar dependencies -->
-        <tinkar-core.version>1.109.0</tinkar-core.version>
-        <tinkar-composer.version>1.6.0</tinkar-composer.version>
-        <tinkar-maven-artifacts.version>1.25.0</tinkar-maven-artifacts.version>
+        <tinkar-core.version>1.119.0</tinkar-core.version>
+        <tinkar-composer.version>1.8.0</tinkar-composer.version>
+        <tinkar-maven-artifacts.version>1.31.0</tinkar-maven-artifacts.version>
         <!-- JPMS-wrapped dependencies -->
         <eclipse-collections-api.version>11.1.0-r11</eclipse-collections-api.version>
         <!-- Maven dependencies -->
