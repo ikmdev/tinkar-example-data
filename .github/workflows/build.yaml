@@ -17,7 +17,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Pull Request Version Validation
-        uses: ikmdev/maven-pull-request-version-validation-action@v1.0.0
+        uses: ikmdev/maven-pull-request-version-validation-action@v2.1.0
         
   build-job:
     name: Build Job
@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build IKMDEV Code
-        uses: ikmdev/maven-clean-install-build-action@v3.3.0
+        uses: ikmdev/maven-clean-install-build-action@v3.5.0
         with:
           branch_name: ${{github.ref_name}}
           mvn_additional_args: -Dtinkar-example-data-properties.version=${{env.DATA_PROPERTIES_VERSION}}
